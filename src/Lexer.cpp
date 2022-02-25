@@ -37,6 +37,12 @@ void Lexer::getNextToken() {
     } else if (*(this->cit) == '/') {
         type = TokenType::Div;
         this->cit++;
+    } else if (*(this->cit) == '(') {
+        type = TokenType::LParenthesis;
+        this->cit++;
+    } else if (*(this->cit) == ')') {
+        type = TokenType::RParenthesis;
+        this->cit++;
     } else if (isdigit(*(this->cit))) {
         type = TokenType::Num;
         do {

@@ -12,11 +12,9 @@
 namespace CCC {
 
     enum class TokenType {
-        Add,
-        Sub,
-        Mul,
-        Div,
+        Add, Sub, Mul, Div,
         Num,
+        LParenthesis, RParenthesis,
         Eof
     };
 

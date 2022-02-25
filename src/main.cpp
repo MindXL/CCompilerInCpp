@@ -7,7 +7,7 @@
 
 using namespace CCC;
 
-const char *code = "   5+1-3*4/2";
+const char *code = "   5+(1-3)*4/2";
 
 void testLexer();
 
@@ -16,8 +16,9 @@ void testParser();
 void testCodeGenerator();
 
 int main(int argc, char *argv[]) {
+#if 1
     if (argc != 2) {
-        std::cout << "please input: ./ccc code" << std::endl;
+        std::cout << "Please input: ./ccc code" << std::endl;
         return 0;
     }
 
@@ -30,6 +31,9 @@ int main(int argc, char *argv[]) {
 
     auto root = parser.parse();
     root->accept(&gen);
+#else
+    testParser();
+#endif
 
     return 0;
 }

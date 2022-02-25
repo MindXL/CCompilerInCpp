@@ -42,8 +42,15 @@ std::shared_ptr<AstNode> Parser::parseMulExpr() {
 }
 
 std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
-    auto p_node = std::make_shared<ConstantNode>(this->lexer.p_token->value);
+    if (this->lexer.p_token->type == TokenType::LParenthesis) {
+        this->lexer.getNextToken();
+        auto p_node = this->parseExpr();
+        this->lexer.getNextToken();
+        return p_node;
+    } else {
+        auto p_node = std::make_shared<ConstantNode>(this->lexer.p_token->value);
 
-    this->lexer.getNextToken();
-    return p_node;
+        this->lexer.getNextToken();
+        return p_node;
+    }
 }
