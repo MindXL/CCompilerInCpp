@@ -4,7 +4,7 @@
 
 #include "PrintVisitor.h"
 
-#include<iostream>
+#include <iostream>
 #include <cassert>
 
 using namespace CCC;

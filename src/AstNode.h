@@ -5,7 +5,7 @@
 #ifndef CCOMPILERINCPP_ASTNODE_H
 #define CCOMPILERINCPP_ASTNODE_H
 
-#include<memory>
+#include <memory>
 
 namespace CCC {
     class AstVisitor;
@@ -59,6 +59,7 @@ namespace CCC {
 
     class AstVisitor {
     public:
+//        virtual ~AstVisitor(){}
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
         virtual void visitBinaryNode(BinaryNode *p_node) = 0;

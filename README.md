@@ -9,5 +9,5 @@ website: "https://space.bilibili.com/181099947/channel/seriesdetail?sid=1964966&
 
 # Features
 
-This C compiler only works on Linux.
+This C compiler works on both Linux and MacOS.
 

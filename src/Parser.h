@@ -5,10 +5,10 @@
 #ifndef CCOMPILERINCPP_PARSER_H
 #define CCOMPILERINCPP_PARSER_H
 
-#include<memory>
+#include <memory>
 
-#include"Lexer.h"
-#include"AstNode.h"
+#include "Lexer.h"
+#include "AstNode.h"
 
 namespace CCC {
     class Parser {

@@ -6,8 +6,8 @@
 #define CCOMPILERINCPP_LEXER_H
 
 
-#include<string_view>
-#include<memory>
+#include <string_view>
+#include <memory>
 
 namespace CCC {
 
@@ -29,13 +29,13 @@ namespace CCC {
 
     class Lexer {
     private:
-        std::string_view source_code;
+        std::string_view source;
         std::string_view::const_iterator cit;
     public:
         std::shared_ptr<Token> p_token;
 
     public:
-        explicit Lexer(const char *code) : source_code{code}, cit{source_code.cbegin()} {}
+        explicit Lexer(const char *code) : source{code}, cit{source.cbegin()} {}
 
         inline bool isEnd();
 

@@ -4,13 +4,13 @@
 
 #include "Lexer.h"
 
-#include<sstream>
+#include <sstream>
 #include <cassert>
 
 using namespace CCC;
 
 inline bool Lexer::isEnd() {
-    return this->cit == this->source_code.cend();
+    return this->cit == this->source.cend();
 }
 
 void Lexer::getNextToken() {
@@ -24,7 +24,7 @@ void Lexer::getNextToken() {
     auto start = this->cit;
     std::stringstream ss;
 
-    if (this->cit == this->source_code.cend()) { type = TokenType::Eof; }
+    if (this->cit == this->source.cend()) { type = TokenType::Eof; }
     else if (*(this->cit) == '+') {
         type = TokenType::Add;
         this->cit++;
@@ -51,8 +51,8 @@ void Lexer::getNextToken() {
     this->p_token = std::make_shared<Token>();
     this->p_token->type = type;
     this->p_token->value = value;
-    this->p_token->content = this->source_code.substr(
-            std::distance(this->source_code.cbegin(), start),
+    this->p_token->content = this->source.substr(
+            std::distance(this->source.cbegin(), start),
             std::distance(start, this->cit)
     );
 }
