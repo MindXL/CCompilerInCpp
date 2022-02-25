@@ -6,10 +6,13 @@
 #define CCOMPILERINCPP_PRINTVISITOR_H
 
 #include "AstNode.h"
+#include <string>
 
 namespace CCC {
     class PrintVisitor : public AstVisitor {
     public:
+        std::string content;
+
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:

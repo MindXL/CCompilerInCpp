@@ -11,3 +11,7 @@ website: [开发C编译器]("https://space.bilibili.com/181099947/channel/series
 
 This C compiler works on both Linux and MacOS.
 
+# More
+
+A test framework called *Catch2* is used in this project. *Catch2* can be found at "https://github.com/catchorg/Catch2".
+

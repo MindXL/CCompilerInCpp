@@ -38,9 +38,6 @@ namespace CCC {
         inline bool isEnd();
 
         void getNextToken();
-
-    public:
-        std::string_view TEST_get_cur_content();
     };
 }
 

@@ -62,7 +62,3 @@ void Lexer::getNextToken() {
             std::distance(start, this->cit)
     );
 }
-
-std::string_view Lexer::TEST_get_cur_content() {
-    return this->p_token->content;
-}
