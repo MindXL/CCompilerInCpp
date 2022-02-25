@@ -1,9 +1,9 @@
-Prog        := Expr
+Program     := Expr
 Expr        := AddExpr
-AddExpr     := MultiExpr
-            := AddExpr + MultiExpr
-            := AddExpr - MultiExpr
-MultiExpr   := PrimaryExpr
-            := MultiExpr * PrimaryExpr
-            := MultiExpr / PrimaryExpr
+AddExpr     := MulExpr
+            := AddExpr + MulExpr
+            := AddExpr - MulExpr
+MulExpr     := PrimaryExpr
+            := MulExpr * PrimaryExpr
+            := MulExpr / PrimaryExpr
 PrimaryExpr := Num

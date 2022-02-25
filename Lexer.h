@@ -30,13 +30,14 @@ namespace CCC {
     class Lexer {
     private:
         std::string_view source_code;
-        std::shared_ptr<Token> p_token;
         std::string_view::const_iterator cit;
+    public:
+        std::shared_ptr<Token> p_token;
 
     public:
-        Lexer(const char *code) : source_code{code}, cit{source_code.cbegin()} {}
+        explicit Lexer(const char *code) : source_code{code}, cit{source_code.cbegin()} {}
 
-        constexpr bool isEnd();
+        inline bool isEnd();
 
         void getNextToken();
 

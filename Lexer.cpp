@@ -3,13 +3,17 @@
 //
 
 #include "Lexer.h"
-#include<sstream>
 
-constexpr bool CCC::Lexer::isEnd() {
+#include<sstream>
+#include <cassert>
+
+using namespace CCC;
+
+inline bool Lexer::isEnd() {
     return this->cit == this->source_code.cend();
 }
 
-void CCC::Lexer::getNextToken() {
+void Lexer::getNextToken() {
     /// skip the whitespace
     while (!isEnd() && isspace(*(this->cit))) {
         this->cit++;
@@ -42,7 +46,7 @@ void CCC::Lexer::getNextToken() {
         ss >> value;
     } else {
         // Error parsing
-//        throw std::exception()
+        assert(0);
     }
     this->p_token = std::make_shared<Token>();
     this->p_token->type = type;
@@ -53,6 +57,6 @@ void CCC::Lexer::getNextToken() {
     );
 }
 
-std::string_view CCC::Lexer::TEST_get_cur_content() {
+std::string_view Lexer::TEST_get_cur_content() {
     return this->p_token->content;
 }
