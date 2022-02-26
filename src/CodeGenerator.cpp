@@ -30,7 +30,7 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
         local->offset = stack_size * -1;
     }
 
-    /* rbp 是当前函数的栈空间基地址, rsp 是当前函数为被调用函数准备的栈空间的基地址 */
+    /* rbp 栈基指针, rsp 栈顶指针 */
 
     // 修改rsp的地址指向rbp
     cout << "\tpush %rbp" << endl
