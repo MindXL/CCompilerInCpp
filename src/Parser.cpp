@@ -4,14 +4,46 @@
 
 #include "Parser.h"
 
+#include <cassert>
+#include <iostream>
+
 using namespace CCC;
 
 std::shared_ptr<ProgramNode> Parser::parse() {
-    return std::make_shared<ProgramNode>(this->parseExpr());
+    auto p_node = std::make_shared<ProgramNode>();
+    this->p_locals = &p_node->locals;    // 绑定变量列表
+    while (this->lexer.p_token->type != TokenType::Eof) {
+        p_node->statements.emplace_back(this->parseStatementExpr());
+    }
+    return p_node;
+}
+
+std::shared_ptr<AstNode> Parser::parseStatementExpr() {
+    auto p_node = std::make_shared<StatementNode>(this->parseExpr());
+    if (this->lexer.p_token->type != TokenType::Semicolon) {
+        std::cout << "lack of semicolon." << std::endl;
+        assert(0);
+    }
+    this->lexer.getNextToken();
+    return p_node;
 }
 
 std::shared_ptr<AstNode> Parser::parseExpr() {
-    return this->parseAddExpr();
+    return this->parseAssignmentExpr();
+}
+
+std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
+    auto left = this->parseAddExpr();
+    if (this->lexer.p_token->type == TokenType::Assignment) {
+        this->lexer.getNextToken();
+        return std::make_shared<AssignmentNode>(
+//                std::move(left),
+                std::dynamic_pointer_cast<IdentifierNode>(left),
+                this->parseAssignmentExpr()
+        );
+    } else {
+        return left;
+    }
 }
 
 std::shared_ptr<AstNode> Parser::parseAddExpr() {
@@ -20,7 +52,11 @@ std::shared_ptr<AstNode> Parser::parseAddExpr() {
     while (this->lexer.p_token->type == TokenType::Add || this->lexer.p_token->type == TokenType::Sub) {
         BinaryOperator op = this->lexer.p_token->type == TokenType::Add ? BinaryOperator::Add : BinaryOperator::Sub;
         this->lexer.getNextToken();
-        auto p_node = std::make_shared<BinaryNode>(op, std::move(left), this->parseMulExpr());
+        auto p_node = std::make_shared<BinaryNode>(
+                op,
+                std::move(left),
+                this->parseMulExpr()
+        );
 
         left = p_node;
     }
@@ -42,15 +78,44 @@ std::shared_ptr<AstNode> Parser::parseMulExpr() {
 }
 
 std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
-    if (this->lexer.p_token->type == TokenType::LParenthesis) {
-        this->lexer.getNextToken();
-        auto p_node = this->parseExpr();
-        this->lexer.getNextToken();
-        return p_node;
-    } else {
-        auto p_node = std::make_shared<ConstantNode>(this->lexer.p_token->value);
-
-        this->lexer.getNextToken();
-        return p_node;
+    std::shared_ptr<AstNode> p_node{nullptr};
+    switch (this->lexer.p_token->type) {
+        case TokenType::LParenthesis: {
+            this->lexer.getNextToken();
+            p_node = this->parseExpr();
+            break;
+        }
+        case TokenType::Num: {
+            p_node = std::make_shared<ConstantNode>(this->lexer.p_token->value);
+            break;
+        }
+        case TokenType::Identifier: {
+            auto name = this->lexer.p_token->content;
+            auto identifier = this->findLocal(name);
+            p_node = std::make_shared<IdentifierNode>(identifier ? identifier : this->registerLocal(name));
+            break;
+        }
+        default: {
+            std::cout << "not supported in Parser::parsePrimaryExpr()" << std::endl;
+            assert(0);
+        }
     }
+    this->lexer.getNextToken();
+    return p_node;
 }
+
+std::shared_ptr<Identifier> Parser::findLocal(std::string_view &name) {
+    const auto cit = this->local_map.find(name);
+    return cit == this->local_map.cend() ? nullptr : cit->second;
+}
+
+std::shared_ptr<Identifier> Parser::registerLocal(std::string_view &name) {
+    auto p_local = std::make_shared<Identifier>(name);
+    this->p_locals->emplace_back(p_local);
+    this->local_map.emplace(name, p_local);
+    return p_local;
+}
+
+
+
+

@@ -15,6 +15,9 @@ namespace CCC {
         Add, Sub, Mul, Div,
         Num,
         LParenthesis, RParenthesis,
+        Identifier,
+        Semicolon,
+        Assignment,
         Eof
     };
 
@@ -35,9 +38,12 @@ namespace CCC {
     public:
         explicit Lexer(const char *code) : source{code}, cit{source.cbegin()} {}
 
-        inline bool isEnd();
+        bool isEnd();
 
         void getNextToken();
+
+    private:
+        bool isValidIdentifierLetter();
     };
 }
 

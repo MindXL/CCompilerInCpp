@@ -16,9 +16,15 @@ namespace CCC {
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
+        void visitStatementNode(StatementNode *p_node) override;
+
+        void visitAssignmentNode(AssignmentNode *p_node) override;
+
         void visitBinaryNode(BinaryNode *p_node) override;
 
         void visitConstantNode(ConstantNode *p_node) override;
+
+        void visitIdentifierNode(IdentifierNode *p_node) override;
     };
 }
 

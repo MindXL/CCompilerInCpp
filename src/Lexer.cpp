@@ -9,56 +9,77 @@
 
 using namespace CCC;
 
-inline bool Lexer::isEnd() {
+bool Lexer::isEnd() {
     return this->cit == this->source.cend();
 }
 
 void Lexer::getNextToken() {
+//    auto &cit=this->cit;    // not essential
+
     /// skip the whitespace
-    while (!isEnd() && isspace(*(this->cit))) {
-        this->cit++;
+    while (this->cit != this->source.cend() && isspace(*cit)) {
+        cit++;
     }
 
     TokenType type;
     int value = 0;
-    auto start = this->cit;
+    const auto start = cit;
     std::stringstream ss;
 
-    if (this->cit == this->source.cend()) { type = TokenType::Eof; }
-    else if (*(this->cit) == '+') {
+    if (cit == this->source.cend()) { type = TokenType::Eof; }
+    else if (*cit == '+') {
         type = TokenType::Add;
-        this->cit++;
-    } else if (*(this->cit) == '-') {
+        cit++;
+    } else if (*cit == '-') {
         type = TokenType::Sub;
-        this->cit++;
-    } else if (*(this->cit) == '*') {
+        cit++;
+    } else if (*cit == '*') {
         type = TokenType::Mul;
-        this->cit++;
-    } else if (*(this->cit) == '/') {
+        cit++;
+    } else if (*cit == '/') {
         type = TokenType::Div;
-        this->cit++;
-    } else if (*(this->cit) == '(') {
+        cit++;
+    } else if (*cit == '(') {
         type = TokenType::LParenthesis;
-        this->cit++;
-    } else if (*(this->cit) == ')') {
+        cit++;
+    } else if (*cit == ')') {
         type = TokenType::RParenthesis;
-        this->cit++;
-    } else if (isdigit(*(this->cit))) {
+        cit++;
+    } else if (*cit == ';') {
+        type = TokenType::Semicolon;
+        cit++;
+    } else if (*cit == '=') {
+        type = TokenType::Assignment;
+        cit++;
+    } else if (isdigit(*cit)) {
         type = TokenType::Num;
         do {
-            ss << *(this->cit);
-            this->cit++;
-        } while (!isEnd() && isdigit(*(this->cit)));
+            ss << *cit;
+            cit++;
+        } while (!isEnd() && isdigit(*cit));
         ss >> value;
+    } else if (this->isValidIdentifierLetter()) {
+        type = TokenType::Identifier;
+        do {
+            cit++;
+        } while (!isEnd() && (this->isValidIdentifierLetter() || isdigit(*cit)));
     } else {
-        // Error parsing
         assert(0);
     }
+
     this->p_token = std::make_shared<Token>();
     this->p_token->type = type;
     this->p_token->value = value;
     this->p_token->content = this->source.substr(
             std::distance(this->source.cbegin(), start),
-            std::distance(start, this->cit)
+            std::distance(start, cit)
     );
 }
+
+bool Lexer::isValidIdentifierLetter() {
+    return ('A' <= *cit && *cit <= 'Z') || ('a' <= *cit && *cit <= 'z') || *cit == '_';
+}
+
+
+
+

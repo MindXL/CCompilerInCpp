@@ -1,10 +1,14 @@
-Program     := Expr
-Expr        := AddExpr
-AddExpr     := MulExpr
-            := AddExpr + MulExpr
-            := AddExpr - MulExpr
-MulExpr     := PrimaryExpr
-            := MulExpr * PrimaryExpr
-            := MulExpr / PrimaryExpr
-PrimaryExpr := Num
-            := (Expr)
+Program        := Statement*
+Statement      := Expr;
+Expr           := AssignmentExpr
+AssignmentExpr := AddExpr
+               := AddExpr = AssignmentExpr
+AddExpr        := MulExpr
+               := AddExpr + MulExpr
+               := AddExpr - MulExpr
+MulExpr        := PrimaryExpr
+               := MulExpr * PrimaryExpr
+               := MulExpr / PrimaryExpr
+PrimaryExpr    := Num
+               := (Expr)
+               := Identifier

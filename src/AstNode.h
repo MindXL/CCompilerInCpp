@@ -6,6 +6,7 @@
 #define CCOMPILERINCPP_ASTNODE_H
 
 #include <memory>
+#include <list>
 
 namespace CCC {
     class AstVisitor;
@@ -17,11 +18,42 @@ namespace CCC {
         virtual void accept(AstVisitor *p_visitor) = 0;
     };
 
+    class Identifier {
+    public:
+        std::string_view name;
+        int offset{0};    // should always be negative
+
+        explicit Identifier(std::string_view &name) : name{name} {}
+    };
+
     class ProgramNode : public AstNode {
+    public:
+        std::list<std::shared_ptr<AstNode>> statements;
+        std::list<std::shared_ptr<Identifier>> locals;
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class StatementNode : public AstNode {
     public:
         std::shared_ptr<AstNode> left;
 
-        explicit ProgramNode(std::shared_ptr<AstNode> &&left) : left{left} {}
+        explicit StatementNode(std::shared_ptr<AstNode> &&left) : left{left} {}
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class IdentifierNode;
+
+    class AssignmentNode : public AstNode {
+    public:
+        std::shared_ptr<IdentifierNode> left;
+        std::shared_ptr<AstNode> right;
+
+        AssignmentNode(
+                std::shared_ptr<IdentifierNode> &&left,
+                std::shared_ptr<AstNode> &&right
+        ) : left{left}, right{right} {}
 
         void accept(AstVisitor *p_visitor) override;
     };
@@ -57,14 +89,29 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
+    class IdentifierNode : public AstNode {
+    public:
+        std::shared_ptr<Identifier> local;
+
+        explicit IdentifierNode(std::shared_ptr<Identifier> &&local) : local{local} {}
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
     class AstVisitor {
     public:
 //        virtual ~AstVisitor(){}
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
+        virtual void visitStatementNode(StatementNode *p_node) = 0;
+
+        virtual void visitAssignmentNode(AssignmentNode *p_node) = 0;
+
         virtual void visitBinaryNode(BinaryNode *p_node) = 0;
 
         virtual void visitConstantNode(ConstantNode *p_node) = 0;
+
+        virtual void visitIdentifierNode(IdentifierNode *p_node) = 0;
     };
 }
 
