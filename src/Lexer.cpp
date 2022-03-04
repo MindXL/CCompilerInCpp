@@ -120,11 +120,3 @@ void Lexer::expectToken(TokenType type) {
 bool Lexer::isValidIdentifierLetter() {
     return ('A' <= *cit && *cit <= 'Z') || ('a' <= *cit && *cit <= 'z') || *cit == '_';
 }
-
-
-
-
-
-
-
-

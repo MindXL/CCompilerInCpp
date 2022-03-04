@@ -53,7 +53,3 @@ void PrintVisitor::visitConstantNode(ConstantNode *p_node) {
 void PrintVisitor::visitIdentifierNode(IdentifierNode *p_node) {
     this->content.append(p_node->local->name);
 }
-
-
-
-

@@ -129,7 +129,3 @@ std::shared_ptr<Identifier> Parser::registerLocal(std::string_view &name) {
     this->local_map.emplace(name, p_local);
     return p_local;
 }
-
-
-
-

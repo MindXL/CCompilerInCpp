@@ -29,5 +29,3 @@ void ConstantNode::accept(AstVisitor *p_visitor) {
 void IdentifierNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitIdentifierNode(this);
 }
-
-
