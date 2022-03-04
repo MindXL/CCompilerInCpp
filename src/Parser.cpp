@@ -4,7 +4,6 @@
 
 #include "Parser.h"
 
-#include <cassert>
 #include <iostream>
 
 using namespace CCC;
@@ -20,10 +19,7 @@ std::shared_ptr<ProgramNode> Parser::parse() {
 
 std::shared_ptr<AstNode> Parser::parseStatementExpr() {
     auto p_node = std::make_shared<StatementNode>(this->parseExpr());
-    if (this->lexer.p_token->type != TokenType::Semicolon) {
-        std::cout << "lack of semicolon." << std::endl;
-        assert(0);
-    }
+    this->lexer.expectToken(TokenType::Semicolon);
     this->lexer.getNextToken();
     return p_node;
 }
@@ -83,6 +79,7 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
         case TokenType::LParenthesis: {
             this->lexer.getNextToken();
             p_node = this->parseExpr();
+            this->lexer.expectToken(TokenType::RParenthesis);
             break;
         }
         case TokenType::Num: {
@@ -96,8 +93,25 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
             break;
         }
         default: {
-            std::cout << "not supported in Parser::parsePrimaryExpr()" << std::endl;
-            assert(0);
+//            const auto&[line, coordinates] = locateLine(this->lexer.source,this->lexer.line_head);
+//            const auto[line_start, line_end] = coordinates;
+//
+//            auto &location = this->lexer.p_token->location;
+//            const size_t len = this->lexer.p_token->content.size();
+
+//            diagnose(
+//                    "source code:", location.line_num + 1, ':', location.col_num + 1, ": \033[1;31mError: \033[0m",
+//                    "grammar around this token '", this->lexer.p_token->content, "' is not supported.\n",
+//                    '\t', location.line_num, " |\t",
+//                    line.substr(line_start, location.col_num),
+//                    "\033[34m", line.substr(location.col_num, len), "\033[0m",
+//                    line.substr(location.col_num + len + 1)
+//            );
+
+            auto &p_token = this->lexer.p_token;
+            diagnose(this->lexer.source, this->lexer.line_head, p_token->location.line_num, p_token->location.col_num,
+                     p_token->content.size(),
+                     "grammar around this token '", p_token->content, "' is not supported.\n");
         }
     }
     this->lexer.getNextToken();

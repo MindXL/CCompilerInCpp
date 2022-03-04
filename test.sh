@@ -4,7 +4,7 @@ cd cmake-build-debug || exit
 make || exit
 
 separate() {
-  echo -e "\033[33m----------------------------------------\033[39m"
+  echo -e "\033[33m----------------------------------------\033[0m"
 }
 
 separate
@@ -13,7 +13,9 @@ separate
 read -r source
 separate
 
-result_s=$(./ccc "${source}")
+if ! result_s=$(./ccc "${source}"); then
+  exit
+fi
 
 while getopts "s" opt; do
   case ${opt} in

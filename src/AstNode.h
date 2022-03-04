@@ -6,6 +6,7 @@
 #define CCOMPILERINCPP_ASTNODE_H
 
 #include <memory>
+#include <string_view>
 #include <list>
 
 namespace CCC {

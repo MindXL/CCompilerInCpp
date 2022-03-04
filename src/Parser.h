@@ -11,6 +11,8 @@
 #include "Lexer.h"
 #include "AstNode.h"
 
+#include "diagnose.h"
+
 namespace CCC {
     class Parser {
     private:
