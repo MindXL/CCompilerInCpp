@@ -32,6 +32,10 @@ namespace CCC {
 
         std::shared_ptr<AstNode> parseAssignmentExpr();
 
+        std::shared_ptr<AstNode> parseEqualityExpr();
+
+        std::shared_ptr<AstNode> parseRelationalExpr();
+
         std::shared_ptr<AstNode> parseAddExpr();
 
         std::shared_ptr<AstNode> parseMulExpr();

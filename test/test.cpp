@@ -31,6 +31,7 @@ TEST_CASE("Lexer", "[Lexer]") {
     REQUIRE(testLexer("1+a/2;") == "1+a/2;");    // semicolon
     REQUIRE(testLexer("a = 1;") == "a=1;");    // assignment
     REQUIRE(testLexer("ab =1; ab+2+3; b=ab;c=ab*b;") == "ab=1;ab+2+3;b=ab;c=ab*b;");    // ...
+    REQUIRE(testLexer("a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;") == "a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;");    // compare operator
 }
 
 TEST_CASE("Parser", "[Parser]") {
@@ -55,6 +56,7 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("1+2-3*4/5;") == "1+2-3*4/5;");
         REQUIRE(testParser("1+23;") == "1+23;");
         REQUIRE(testParser("12+3;") == "12+3;");
+        REQUIRE(testParser("a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;") == "a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;");
     }
 
 //    SECTION("Parentheses") {

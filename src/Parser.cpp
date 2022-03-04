@@ -5,6 +5,7 @@
 #include "Parser.h"
 
 #include <iostream>
+#include <cassert>
 
 using namespace CCC;
 
@@ -29,7 +30,7 @@ std::shared_ptr<AstNode> Parser::parseExpr() {
 }
 
 std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
-    auto left = this->parseAddExpr();
+    auto left = this->parseEqualityExpr();
     if (this->lexer.p_token->type == TokenType::Assignment) {
         this->lexer.getNextToken();
         return std::make_shared<AssignmentNode>(
@@ -42,16 +43,57 @@ std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
     }
 }
 
-std::shared_ptr<AstNode> Parser::parseAddExpr() {
-    std::shared_ptr<AstNode> left = this->parseMulExpr();
+std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
+    auto left = this->parseRelationalExpr();
+    auto &type = this->lexer.p_token->type;
+    while (type == TokenType::EQ || type == TokenType::NE) {
+        BinaryOperator op = type == TokenType::EQ ? BinaryOperator::EQ : BinaryOperator::NE;
+        this->lexer.getNextToken();
+        auto p_node = std::make_shared<BinaryNode>(op, std::move(left), this->parseEqualityExpr());
+        left = p_node;
+    }
+    return left;
+}
 
-    while (this->lexer.p_token->type == TokenType::Add || this->lexer.p_token->type == TokenType::Sub) {
-        BinaryOperator op = this->lexer.p_token->type == TokenType::Add ? BinaryOperator::Add : BinaryOperator::Sub;
+std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
+    auto left = this->parseAddExpr();
+    auto &type = this->lexer.p_token->type;
+    while (type == TokenType::GT || type == TokenType::GE || type == TokenType::LT || type == TokenType::LE) {
+        BinaryOperator op;
+        switch (type) {
+            case TokenType::GT:
+                op = BinaryOperator::GT;
+                break;
+            case TokenType::GE:
+                op = BinaryOperator::GE;
+                break;
+            case TokenType::LT:
+                op = BinaryOperator::LT;
+                break;
+            case TokenType::LE:
+                op = BinaryOperator::LE;
+                break;
+            default:
+                assert(0);
+        }
+        this->lexer.getNextToken();
+        auto p_node = std::make_shared<BinaryNode>(op, std::move(left), this->parseRelationalExpr());
+        left = p_node;
+    }
+    return left;
+}
+
+std::shared_ptr<AstNode> Parser::parseAddExpr() {
+    auto left = this->parseMulExpr();
+
+    auto &type = this->lexer.p_token->type;
+    while (type == TokenType::Add || type == TokenType::Sub) {
+        BinaryOperator op = type == TokenType::Add ? BinaryOperator::Add : BinaryOperator::Sub;
         this->lexer.getNextToken();
         auto p_node = std::make_shared<BinaryNode>(
                 op,
                 std::move(left),
-                this->parseMulExpr()
+                this->parseAddExpr()
         );
 
         left = p_node;
@@ -60,13 +102,14 @@ std::shared_ptr<AstNode> Parser::parseAddExpr() {
 }
 
 std::shared_ptr<AstNode> Parser::parseMulExpr() {
-    std::shared_ptr<AstNode> left = this->parsePrimaryExpr();
+    auto left = this->parsePrimaryExpr();
 
-    while (this->lexer.p_token->type == TokenType::Mul || this->lexer.p_token->type == TokenType::Div) {
-        BinaryOperator op = this->lexer.p_token->type == TokenType::Mul ? BinaryOperator::Mul : BinaryOperator::Div;
+    auto &type = this->lexer.p_token->type;
+    while (type == TokenType::Mul || type == TokenType::Div) {
+        BinaryOperator op = type == TokenType::Mul ? BinaryOperator::Mul : BinaryOperator::Div;
         this->lexer.getNextToken();
 
-        auto p_node = std::make_shared<BinaryNode>(op, std::move(left), this->parsePrimaryExpr());
+        auto p_node = std::make_shared<BinaryNode>(op, std::move(left), this->parseMulExpr());
 
         left = p_node;
     }
@@ -119,7 +162,7 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
 }
 
 std::shared_ptr<Identifier> Parser::findLocal(std::string_view &name) {
-    const auto cit = this->local_map.find(name);
+    auto cit = this->local_map.find(name);
     return cit == this->local_map.cend() ? nullptr : cit->second;
 }
 

@@ -1,14 +1,30 @@
 Program        := Statement*
+
 Statement      := Expr;
+
 Expr           := AssignmentExpr
-AssignmentExpr := AddExpr
-               := AddExpr = AssignmentExpr
+
+AssignmentExpr := EqualityExpr
+               := EqualityExpr = AssignmentExpr
+
+EqualityExpr   := RelationalExpr
+               := EqualityExpr == RelationalExpr
+               := EqualityExpr != RelationalExpr
+
+RelationalExpr := AddExpr
+               := RelationalExpr < AddExpr
+               := RelationalExpr > AddExpr
+               := RelationalExpr <= AddExpr
+               := RelationalExpr >= AddExpr
+
 AddExpr        := MulExpr
                := AddExpr + MulExpr
                := AddExpr - MulExpr
+
 MulExpr        := PrimaryExpr
                := MulExpr * PrimaryExpr
                := MulExpr / PrimaryExpr
+
 PrimaryExpr    := Num
                := (Expr)
                := Identifier

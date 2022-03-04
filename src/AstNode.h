@@ -60,10 +60,8 @@ namespace CCC {
     };
 
     enum class BinaryOperator {
-        Add,
-        Sub,
-        Mul,
-        Div
+        Add, Sub, Mul, Div,
+        EQ, NE, GT, GE, LT, LE
     };
 
     class BinaryNode : public AstNode {

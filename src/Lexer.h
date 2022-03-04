@@ -19,6 +19,7 @@ namespace CCC {
         Identifier,
         Semicolon,
         Assignment,
+        EQ, NE, GT, GE, LT, LE,
         Eof
     };
 
@@ -66,6 +67,8 @@ namespace CCC {
 
     private:
         bool isValidIdentifierLetter();
+
+        char peekChar();
     };
 }
 

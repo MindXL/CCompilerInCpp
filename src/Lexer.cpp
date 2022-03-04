@@ -34,29 +34,59 @@ void Lexer::getNextToken() {
 
     if (cit == this->source.cend()) { type = TokenType::Eof; }
     else if (*cit == '+') {
+        cit++;
         type = TokenType::Add;
-        cit++;
     } else if (*cit == '-') {
+        cit++;
         type = TokenType::Sub;
-        cit++;
     } else if (*cit == '*') {
+        cit++;
         type = TokenType::Mul;
-        cit++;
     } else if (*cit == '/') {
+        cit++;
         type = TokenType::Div;
-        cit++;
     } else if (*cit == '(') {
+        cit++;
         type = TokenType::LParenthesis;
-        cit++;
     } else if (*cit == ')') {
+        cit++;
         type = TokenType::RParenthesis;
-        cit++;
     } else if (*cit == ';') {
+        cit++;
         type = TokenType::Semicolon;
-        cit++;
     } else if (*cit == '=') {
-        type = TokenType::Assignment;
         cit++;
+        if (this->peekChar() == '=') {
+            type = TokenType::EQ;
+            cit++;
+        } else {
+            type = TokenType::Assignment;
+        }
+    } else if (*cit == '!') {
+        cit++;
+        if (this->peekChar() == '=') {
+            type = TokenType::NE;
+            cit++;
+        } else {
+            diagnose(this->source, this->line_head, location.line_num, location.col_num, this->p_token->content.size(),
+                     "unexpected '", *cit, '\'');
+        }
+    } else if (*cit == '>') {
+        cit++;
+        if (this->peekChar() == '=') {
+            type = TokenType::GE;
+            cit++;
+        } else {
+            type = TokenType::GT;
+        }
+    } else if (*cit == '<') {
+        cit++;
+        if (this->peekChar() == '=') {
+            type = TokenType::LE;
+            cit++;
+        } else {
+            type = TokenType::LT;
+        }
     } else if (isdigit(*cit)) {
         type = TokenType::Num;
         std::stringstream ss;
@@ -119,4 +149,13 @@ void Lexer::expectToken(TokenType type) {
 
 bool Lexer::isValidIdentifierLetter() {
     return ('A' <= *cit && *cit <= 'Z') || ('a' <= *cit && *cit <= 'z') || *cit == '_';
+}
+
+char Lexer::peekChar() {
+    if (this->isEnd())
+        return '\0';
+    auto next_it = this->cit + 1;
+    if (next_it == this->source.cend())
+        return '\0';
+    return *cit;
 }

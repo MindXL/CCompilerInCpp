@@ -40,8 +40,24 @@ void PrintVisitor::visitBinaryNode(BinaryNode *p_node) {
         case BinaryOperator::Div:
             this->content.push_back('/');
             break;
-        default:
-            assert(0);
+        case BinaryOperator::EQ:
+            this->content.append("==");
+            break;
+        case BinaryOperator::NE:
+            this->content.append("!=");
+            break;
+        case BinaryOperator::GT:
+            this->content.push_back('>');
+            break;
+        case BinaryOperator::GE:
+            this->content.append(">=");
+            break;
+        case BinaryOperator::LT:
+            this->content.push_back('<');
+            break;
+        case BinaryOperator::LE:
+            this->content.append("<=");
+            break;
     }
     p_node->right->accept(this);
 }

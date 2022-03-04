@@ -69,8 +69,11 @@ void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
 void CodeGenerator::visitBinaryNode(BinaryNode *p_node) {
     using std::cout, std::endl;
 
+    // 右操作数在rax
     p_node->right->accept(this);
     this->pushRAX();
+
+    // 左操作数在rdi
     p_node->left->accept(this);
     this->popTo("%rdi");
 
@@ -88,8 +91,36 @@ void CodeGenerator::visitBinaryNode(BinaryNode *p_node) {
             cout << "\tcqo" << endl
                  << "\tidiv %rdi" << endl;
             break;
-        default:
-            assert(0);
+        case BinaryOperator::EQ:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsete %al" << endl
+                 << "\tmovzb %al, %rax" << endl;    // z: 扩展; b: 单字节
+            break;
+        case BinaryOperator::NE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetne %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::GT:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetg %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::GE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetge %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::LT:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetl %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::LE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetle %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
     }
 }
 
