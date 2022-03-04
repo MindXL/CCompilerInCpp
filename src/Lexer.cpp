@@ -14,8 +14,6 @@ bool Lexer::isEnd() {
 }
 
 void Lexer::getNextToken() {
-//    auto &cit=this->cit;    // not essential
-
     /// skip the whitespace
     while (cit != this->source.cend() && isspace(*cit)) {
         if (*cit == '\n') {
@@ -101,17 +99,6 @@ void Lexer::getNextToken() {
             cit++;
         } while (!isEnd() && (this->isValidIdentifierLetter() || isdigit(*cit)));
     } else {
-//        const auto&[line, coordinates] = locateLine(*this);
-//        const auto[line_start, _] = coordinates;
-//
-//        diagnose(
-//                "source code:", location.line_num + 1, ':', location.col_num + 1, ": \033[1;31mError: \033[0m",
-//                "unexpected '", *cit, "'\n",
-//                '\t', location.line_num, " |\t",
-//                line.substr(line_start, location.col_num),
-//                "\033[34m", line.at(location.col_num), "\033[0m",
-//                line.substr(location.col_num + 1)
-//        );
         diagnose(this->source, this->line_head, location.line_num, location.col_num, this->p_token->content.size(),
                  "unexpected '", *cit, '\'');
     }

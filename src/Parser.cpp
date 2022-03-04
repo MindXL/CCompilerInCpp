@@ -34,7 +34,6 @@ std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
     if (this->lexer.p_token->type == TokenType::Assignment) {
         this->lexer.getNextToken();
         return std::make_shared<AssignmentNode>(
-//                std::move(left),
                 std::dynamic_pointer_cast<IdentifierNode>(left),
                 this->parseAssignmentExpr()
         );
@@ -136,21 +135,6 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
             break;
         }
         default: {
-//            const auto&[line, coordinates] = locateLine(this->lexer.source,this->lexer.line_head);
-//            const auto[line_start, line_end] = coordinates;
-//
-//            auto &location = this->lexer.p_token->location;
-//            const size_t len = this->lexer.p_token->content.size();
-
-//            diagnose(
-//                    "source code:", location.line_num + 1, ':', location.col_num + 1, ": \033[1;31mError: \033[0m",
-//                    "grammar around this token '", this->lexer.p_token->content, "' is not supported.\n",
-//                    '\t', location.line_num, " |\t",
-//                    line.substr(line_start, location.col_num),
-//                    "\033[34m", line.substr(location.col_num, len), "\033[0m",
-//                    line.substr(location.col_num + len + 1)
-//            );
-
             auto &p_token = this->lexer.p_token;
             diagnose(this->lexer.source, this->lexer.line_head, p_token->location.line_num, p_token->location.col_num,
                      p_token->content.size(),

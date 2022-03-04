@@ -13,8 +13,6 @@ namespace CCC {
         int stack_level{0};
 
     public:
-//        CodeGenerator(){}
-
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:

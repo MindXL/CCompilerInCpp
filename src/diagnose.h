@@ -43,17 +43,6 @@ namespace CCC {
 
         exit(1);
     }
-
-//    void diagnose(std::string_view code, int line, long col_num, const char *fmt, ...) {
-//        va_list ap;
-//        va_start(ap, fmt);
-//        std::cerr << code << std::endl;
-//        fprintf(stderr, "%*s", int(col_num), "");
-//        vfprintf(stderr, fmt, ap);
-//        std::cerr << std::endl;
-//        va_end(ap);
-//        exit(1);
-//    }
 }
 
 #endif //CCC_DIAGNOSE_H

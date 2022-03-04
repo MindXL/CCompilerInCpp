@@ -14,15 +14,13 @@ namespace CCC {
 
     class AstNode {
     public:
-//        virtual ~AstNode() {};
-
         virtual void accept(AstVisitor *p_visitor) = 0;
     };
 
     class Identifier {
     public:
         std::string_view name;
-        int offset{0};    // should always be negative
+        int offset{-1};    // should always be negative
 
         explicit Identifier(std::string_view &name) : name{name} {}
     };
@@ -99,7 +97,6 @@ namespace CCC {
 
     class AstVisitor {
     public:
-//        virtual ~AstVisitor(){}
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
         virtual void visitStatementNode(StatementNode *p_node) = 0;
