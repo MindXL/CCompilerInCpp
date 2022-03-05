@@ -141,8 +141,14 @@ void Lexer::expectToken(TokenType type) {
             case TokenType::Semicolon:
                 expected = ';';
                 break;
+            case TokenType::LParenthesis:
+                expected = '(';
+                break;
             case TokenType::RParenthesis:
                 expected = ')';
+                break;
+            case TokenType::RBrace:
+                expected = '}';
                 break;
             default:
                 assert(0);
