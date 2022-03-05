@@ -46,6 +46,7 @@ TEST_CASE("Lexer", "[Lexer]") {
     SECTION("Braces") {
         REQUIRE(testLexer("a=3; if (a==1) {a=1;} else if(a==2){a=2;}else {a=a*a;a=0;}") ==
                 "a=3;if(a==1){a=1;}elseif(a==2){a=2;}else{a=a*a;a=0;}");
+        REQUIRE(testLexer("a=1;if(a==1){}") == "a=1;if(a==1){}");
     }
 }
 
@@ -109,5 +110,6 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("a=3; if (a==1) {a=1;} else {if(a==2){a=2;}else {a=a*a;a=0;}a=100;}") ==
                 "a=3;if(a==1){a=1;}else {if(a==2){a=2;}else {a=a*a;a=0;}a=100;}");
         REQUIRE(testParser("a=1;if(a==1)a=2;else {a=3;}") == "a=1;if(a==1)a=2;else {a=3;}");
+        REQUIRE(testParser("a=1;if(a==1){}") == "a=1;if(a==1){}");
     }
 }
