@@ -19,10 +19,26 @@ std::shared_ptr<ProgramNode> Parser::parse() {
 }
 
 std::shared_ptr<AstNode> Parser::parseStatementExpr() {
-    auto p_node = std::make_shared<StatementNode>(this->parseExpr());
-    this->lexer.expectToken(TokenType::Semicolon);
-    this->lexer.getNextToken();
-    return p_node;
+    if (this->lexer.p_token->type == TokenType::IF) {
+        auto p_node = std::make_shared<IfStatementNode>();
+        this->lexer.getNextToken();
+        this->lexer.expectToken(TokenType::LParenthesis);
+        this->lexer.getNextToken();
+        p_node->condition_expr = this->parseExpr();
+        this->lexer.expectToken(TokenType::RParenthesis);
+        this->lexer.getNextToken();
+        p_node->then_stmt = this->parseStatementExpr();
+        if (this->lexer.p_token->type == TokenType::ELSE) {
+            this->lexer.getNextToken();
+            p_node->else_stmt = this->parseStatementExpr();
+        }
+        return p_node;
+    } else {
+        auto p_node = std::make_shared<StatementNode>(this->parseExpr());
+        this->lexer.expectToken(TokenType::Semicolon);
+        this->lexer.getNextToken();
+        return p_node;
+    }
 }
 
 std::shared_ptr<AstNode> Parser::parseExpr() {

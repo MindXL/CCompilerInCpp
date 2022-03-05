@@ -94,10 +94,20 @@ void Lexer::getNextToken() {
         } while (!isEnd() && isdigit(*cit));
         ss >> value;
     } else if (this->isValidIdentifierLetter()) {
-        type = TokenType::Identifier;
         do {
             cit++;
         } while (!isEnd() && (this->isValidIdentifierLetter() || isdigit(*cit)));
+        auto content = this->source.substr(
+                std::distance(this->source.cbegin(), start),
+                std::distance(start, cit)
+        );
+        if (content == "if") {
+            type = TokenType::IF;
+        } else if (content == "else") {
+            type = TokenType::ELSE;
+        } else {
+            type = TokenType::Identifier;
+        }
     } else {
         diagnose(this->source, this->line_head, location.line_num, location.col_num, this->p_token->content.size(),
                  "unexpected '", *cit, '\'');
@@ -115,6 +125,8 @@ void Lexer::getNextToken() {
 }
 
 void Lexer::expectToken(TokenType type) {
+    // This function won't pass the current token.
+    // After 'expectToken', 'getNextToken' is needed provided to pass the current token.
     if (this->p_token->type != type) {
         char expected{'\0'};
         switch (type) {
@@ -125,7 +137,7 @@ void Lexer::expectToken(TokenType type) {
                 expected = ')';
                 break;
             default:
-                assert(1);
+                assert(0);
         }
         const auto&[line_num, col_num]=this->p_token->location;
         diagnose(this->source, this->line_head, line_num, col_num, 0,

@@ -19,6 +19,18 @@ void PrintVisitor::visitStatementNode(StatementNode *p_node) {
     this->content.push_back(';');
 }
 
+void PrintVisitor::visitIfStatementNode(IfStatementNode *p_node) {
+    this->content.append("if");
+    this->content.push_back('(');
+    p_node->condition_expr->accept(this);
+    this->content.push_back(')');
+    p_node->then_stmt->accept(this);
+    if (p_node->else_stmt) {
+        this->content.append("else ");
+        p_node->else_stmt->accept(this);
+    }
+}
+
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
     this->content.push_back('=');

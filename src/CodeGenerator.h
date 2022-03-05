@@ -11,12 +11,15 @@ namespace CCC {
     class CodeGenerator : public AstVisitor {
     private:
         int stack_level{0};
+        int n_IfStmt{0};
 
     public:
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
         void visitStatementNode(StatementNode *p_node) override;
+
+        void visitIfStatementNode(IfStatementNode *p_node) override;
 
         void visitAssignmentNode(AssignmentNode *p_node) override;
 

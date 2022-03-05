@@ -54,6 +54,29 @@ void CodeGenerator::visitStatementNode(StatementNode *p_node) {
     p_node->left->accept(this);
 }
 
+void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = this->n_IfStmt++;
+
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl;
+    if (p_node->else_stmt) {
+        // 如果条件为假且有else语句则先跳else语句
+        cout << "\tje .L" << n << ".else" << endl;
+    } else {
+        // 如果条件为假且无else语句则跳if语句结束
+        cout << "\tje .L" << n << ".end" << endl;
+    }
+    p_node->then_stmt->accept(this);
+    cout << "\tjmp .L" << n << ".end" << endl;
+    if (p_node->else_stmt) {
+        cout << ".L" << n << ".else:" << endl;
+        p_node->else_stmt->accept(this);
+    }
+    cout << ".L" << n << ".end:" << endl;
+}
+
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
     using std::cout, std::endl;
 

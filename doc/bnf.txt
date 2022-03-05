@@ -1,6 +1,8 @@
 Program        := Statement*
 
 Statement      := Expr;
+               := if (Expr) Statement
+               := if (Expr) Statement else Statement
 
 Expr           := AssignmentExpr
 

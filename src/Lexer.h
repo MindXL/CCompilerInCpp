@@ -20,6 +20,9 @@ namespace CCC {
         Semicolon,
         Assignment,
         EQ, NE, GT, GE, LT, LE,
+
+        IF, ELSE,
+
         Eof
     };
 
