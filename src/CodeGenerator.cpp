@@ -64,7 +64,7 @@ void CodeGenerator::visitBlockStatementNode(BlockStatementNode *p_node) {
 void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
     using std::cout, std::endl;
 
-    const int n = n_IfStmt++;
+    const int n = n_mnemonic++;
 
     p_node->condition_expr->accept(this);
     cout << "\tcmp $0, %rax" << endl;
@@ -82,6 +82,20 @@ void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
         p_node->else_stmt->accept(this);
     }
     cout << ".L" << n << ".end:" << endl;
+}
+
+void CodeGenerator::visitWhileStatementNode(WhileStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    cout << ".L" << n << ".begin:" << endl;
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl
+         << "\tje .L" << n << ".end" << endl;
+    p_node->then_stmt->accept(this);
+    cout << "\tjmp .L" << n << ".begin" << endl
+         << ".L" << n << ".end:" << endl;
 }
 
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {

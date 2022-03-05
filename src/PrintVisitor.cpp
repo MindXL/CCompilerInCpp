@@ -40,6 +40,14 @@ void PrintVisitor::visitIfStatementNode(IfStatementNode *p_node) {
     }
 }
 
+void PrintVisitor::visitWhileStatementNode(WhileStatementNode *p_node) {
+    content += "while";
+    content += '(';
+    p_node->condition_expr->accept(this);
+    content += ')';
+    p_node->then_stmt->accept(this);
+}
+
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
     content += '=';

@@ -22,6 +22,10 @@ void IfStatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitIfStatementNode(this);
 }
 
+void WhileStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitWhileStatementNode(this);
+}
+
 void AssignmentNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitAssignmentNode(this);
 }

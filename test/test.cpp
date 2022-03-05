@@ -43,6 +43,10 @@ TEST_CASE("Lexer", "[Lexer]") {
                 "a=3;if(a==1)a=1;elseif(a==2)a=2;elsea=a*a;");
     }
 
+    SECTION("While Statement") {
+        REQUIRE(testLexer("a=0;while(a<10){a=a+1;a;}a;") == "a=0;while(a<10){a=a+1;a;}a;");
+    }
+
     SECTION("Braces") {
         REQUIRE(testLexer("a=3; if (a==1) {a=1;} else if(a==2){a=2;}else {a=a*a;a=0;}") ==
                 "a=3;if(a==1){a=1;}elseif(a==2){a=2;}else{a=a*a;a=0;}");
@@ -106,6 +110,10 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("a=3; if (a==1) a=1; else a=a*a;") == "a=3;if(a==1)a=1;else a=a*a;");
         REQUIRE(testParser("a=3; if (a==1) a=1; else if(a==2)a=2;else a=a*a;") ==
                 "a=3;if(a==1)a=1;else if(a==2)a=2;else a=a*a;");
+    }
+
+    SECTION("While Statement") {
+        REQUIRE(testParser("a=0;while(a<10){a=a+1;a;}a;") == "a=0;while(a<10){a=a+1;a;}a;");
     }
 
     SECTION("Braces") {

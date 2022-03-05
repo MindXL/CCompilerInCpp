@@ -3,6 +3,7 @@ Program        := Statement*
 Statement      := Expr?;
                := if (Expr) Statement
                := if (Expr) Statement else Statement
+               := while (Expr) Statement
                := {Statement*}
 
 Expr           := AssignmentExpr

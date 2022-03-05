@@ -20,34 +20,51 @@ std::shared_ptr<ProgramNode> Parser::parse() {
 
 std::shared_ptr<AstNode> Parser::parseStatementExpr() {
     auto &p_token = lexer.p_token;
-    if (p_token->type == TokenType::IF) {
-        auto p_node = std::make_shared<IfStatementNode>();
-        lexer.getNextToken();
-        lexer.expectToken(TokenType::LParenthesis);
-        lexer.getNextToken();
-        p_node->condition_expr = parseExpr();
-        lexer.expectToken(TokenType::RParenthesis);
-        lexer.getNextToken();
-        p_node->then_stmt = parseStatementExpr();
-        if (p_token->type == TokenType::ELSE) {
+    switch (p_token->type) {
+        case TokenType::IF: {
+            auto p_node = std::make_shared<IfStatementNode>();
             lexer.getNextToken();
-            p_node->else_stmt = parseStatementExpr();
+            lexer.expectToken(TokenType::LParenthesis);
+            lexer.getNextToken();
+            p_node->condition_expr = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            lexer.getNextToken();
+            p_node->then_stmt = parseStatementExpr();
+            if (p_token->type == TokenType::ELSE) {
+                lexer.getNextToken();
+                p_node->else_stmt = parseStatementExpr();
+            }
+            return p_node;
         }
-        return p_node;
-    } else if (p_token->type == TokenType::LBrace) {
-        auto p_node = std::make_shared<BlockStatementNode>();
-        lexer.getNextToken();
-        while (p_token->type != TokenType::RBrace) {
-            p_node->statements.emplace_back(parseStatementExpr());
+        case TokenType::WHILE: {
+            auto p_node = std::make_shared<WhileStatementNode>();
+            lexer.getNextToken();
+            lexer.expectToken(TokenType::LParenthesis);
+            lexer.getNextToken();
+            p_node->condition_expr = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            lexer.getNextToken();
+            p_node->then_stmt = parseStatementExpr();
+            return p_node;
         }
-        lexer.expectToken(TokenType::RBrace);
-        lexer.getNextToken();
-        return p_node;
-    } else {
-        auto p_node = std::make_shared<StatementNode>(p_token->type != TokenType::Semicolon ? parseExpr() : nullptr);
-        lexer.expectToken(TokenType::Semicolon);
-        lexer.getNextToken();
-        return p_node;
+        case TokenType::LBrace: {
+            auto p_node = std::make_shared<BlockStatementNode>();
+            lexer.getNextToken();
+            while (p_token->type != TokenType::RBrace) {
+                p_node->statements.emplace_back(parseStatementExpr());
+            }
+            lexer.expectToken(TokenType::RBrace);
+            lexer.getNextToken();
+            return p_node;
+        }
+        default: {
+            auto p_node = std::make_shared<StatementNode>(
+                    p_token->type != TokenType::Semicolon ? parseExpr() : nullptr
+            );
+            lexer.expectToken(TokenType::Semicolon);
+            lexer.getNextToken();
+            return p_node;
+        }
     }
 }
 
