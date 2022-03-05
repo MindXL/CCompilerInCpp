@@ -51,7 +51,8 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
 }
 
 void CodeGenerator::visitStatementNode(StatementNode *p_node) {
-    p_node->left->accept(this);
+    if (p_node->left)
+        p_node->left->accept(this);
 }
 
 void CodeGenerator::visitBlockStatementNode(BlockStatementNode *p_node) {

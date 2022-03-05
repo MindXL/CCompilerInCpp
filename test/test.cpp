@@ -48,6 +48,10 @@ TEST_CASE("Lexer", "[Lexer]") {
                 "a=3;if(a==1){a=1;}elseif(a==2){a=2;}else{a=a*a;a=0;}");
         REQUIRE(testLexer("a=1;if(a==1){}") == "a=1;if(a==1){}");
     }
+
+    SECTION("Null Statement") {
+        REQUIRE(testLexer("a=1;;a;") == "a=1;;a;");
+    }
 }
 
 TEST_CASE("Parser", "[Parser]") {
@@ -111,5 +115,9 @@ TEST_CASE("Parser", "[Parser]") {
                 "a=3;if(a==1){a=1;}else {if(a==2){a=2;}else {a=a*a;a=0;}a=100;}");
         REQUIRE(testParser("a=1;if(a==1)a=2;else {a=3;}") == "a=1;if(a==1)a=2;else {a=3;}");
         REQUIRE(testParser("a=1;if(a==1){}") == "a=1;if(a==1){}");
+    }
+
+    SECTION("Null Statement") {
+        REQUIRE(testParser("a=1;;a;") == "a=1;;a;");
     }
 }

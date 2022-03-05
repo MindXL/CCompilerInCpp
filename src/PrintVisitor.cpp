@@ -15,7 +15,8 @@ void PrintVisitor::visitProgramNode(ProgramNode *p_node) {
 }
 
 void PrintVisitor::visitStatementNode(StatementNode *p_node) {
-    p_node->left->accept(this);
+    if (p_node->left)
+        p_node->left->accept(this);
     content += ';';
 }
 

@@ -1,6 +1,6 @@
 Program        := Statement*
 
-Statement      := Expr;
+Statement      := Expr?;
                := if (Expr) Statement
                := if (Expr) Statement else Statement
                := {Statement*}

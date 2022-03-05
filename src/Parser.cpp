@@ -44,7 +44,7 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
         lexer.getNextToken();
         return p_node;
     } else {
-        auto p_node = std::make_shared<StatementNode>(parseExpr());
+        auto p_node = std::make_shared<StatementNode>(p_token->type != TokenType::Semicolon ? parseExpr() : nullptr);
         lexer.expectToken(TokenType::Semicolon);
         lexer.getNextToken();
         return p_node;
