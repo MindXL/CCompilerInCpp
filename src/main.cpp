@@ -22,6 +22,5 @@ int main(int argc, char *argv[]) {
     auto root = parser.parse();
     root->accept(&gen);
 
-
     return 0;
 }

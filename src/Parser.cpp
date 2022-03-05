@@ -187,7 +187,7 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
             auto &p_token = lexer.p_token;
             diagnose(lexer.source, lexer.line_head, p_token->location.line_num, p_token->location.col_num,
                      p_token->content.size(),
-                     "grammar around this token '", p_token->content, "' is not supported.\n");
+                     "grammar around this token '", p_token->content, "' is not supported.");
         }
     }
     lexer.getNextToken();
