@@ -41,7 +41,7 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
 
     for (const auto &statement:p_node->statements) {
         statement->accept(this);
-        assert(this->stack_level == 0);
+        assert(stack_level == 0);
     }
 
     /* 函数结束 */
@@ -63,7 +63,7 @@ void CodeGenerator::visitBlockStatementNode(BlockStatementNode *p_node) {
 void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
     using std::cout, std::endl;
 
-    const int n = this->n_IfStmt++;
+    const int n = n_IfStmt++;
 
     p_node->condition_expr->accept(this);
     cout << "\tcmp $0, %rax" << endl;
@@ -89,9 +89,9 @@ void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
     /// x86
     assert(p_node->left != nullptr);
     cout << "\tlea " << p_node->left->local->offset << "(%rbp), %rax" << endl;    // 取变量地址至rax
-    this->pushRAX();    // rax（变量的地址）入栈
+    pushRAX();    // rax（变量的地址）入栈
     p_node->right->accept(this);    // 计算赋值运算符的右操作数并取至rax
-    this->popTo("%rdi");    // 变量的地址弹出至rdi
+    popTo("%rdi");    // 变量的地址弹出至rdi
     cout << "\tmov %rax, (%rdi)" << endl;    // 右操作数存入变量的地址处
 }
 
@@ -100,11 +100,11 @@ void CodeGenerator::visitBinaryNode(BinaryNode *p_node) {
 
     // 右操作数在rax
     p_node->right->accept(this);
-    this->pushRAX();
+    pushRAX();
 
     // 左操作数在rdi
     p_node->left->accept(this);
-    this->popTo("%rdi");
+    popTo("%rdi");
 
     switch (p_node->op) {
         case BinaryOperator::Add:
@@ -159,12 +159,12 @@ void CodeGenerator::visitConstantNode(ConstantNode *p_node) {
 
 void CodeGenerator::pushRAX() {
     std::cout << "\tpush %rax" << std::endl;
-    this->stack_level++;
+    stack_level++;
 }
 
 void CodeGenerator::popTo(const char *reg) {
     std::cout << "\tpop " << reg << std::endl;
-    this->stack_level--;
+    stack_level--;
 }
 
 void CodeGenerator::visitIdentifierNode(IdentifierNode *p_node) {
