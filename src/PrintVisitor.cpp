@@ -19,6 +19,14 @@ void PrintVisitor::visitStatementNode(StatementNode *p_node) {
     this->content.push_back(';');
 }
 
+void PrintVisitor::visitBlockStatementNode(BlockStatementNode *p_node) {
+    this->content.push_back('{');
+    for (const auto &stmt:p_node->statements) {
+        stmt->accept(this);
+    }
+    this->content.push_back('}');
+}
+
 void PrintVisitor::visitIfStatementNode(IfStatementNode *p_node) {
     this->content.append("if");
     this->content.push_back('(');

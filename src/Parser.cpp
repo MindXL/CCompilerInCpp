@@ -19,7 +19,8 @@ std::shared_ptr<ProgramNode> Parser::parse() {
 }
 
 std::shared_ptr<AstNode> Parser::parseStatementExpr() {
-    if (this->lexer.p_token->type == TokenType::IF) {
+    auto &p_token = this->lexer.p_token;
+    if (p_token->type == TokenType::IF) {
         auto p_node = std::make_shared<IfStatementNode>();
         this->lexer.getNextToken();
         this->lexer.expectToken(TokenType::LParenthesis);
@@ -28,10 +29,19 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
         this->lexer.expectToken(TokenType::RParenthesis);
         this->lexer.getNextToken();
         p_node->then_stmt = this->parseStatementExpr();
-        if (this->lexer.p_token->type == TokenType::ELSE) {
+        if (p_token->type == TokenType::ELSE) {
             this->lexer.getNextToken();
             p_node->else_stmt = this->parseStatementExpr();
         }
+        return p_node;
+    } else if (p_token->type == TokenType::LBrace) {
+        auto p_node = std::make_shared<BlockStatementNode>();
+        this->lexer.getNextToken();
+        while (p_token->type != TokenType::RBrace) {
+            p_node->statements.emplace_back(this->parseStatementExpr());
+        }
+        this->lexer.expectToken(TokenType::RBrace);
+        this->lexer.getNextToken();
         return p_node;
     } else {
         auto p_node = std::make_shared<StatementNode>(this->parseExpr());

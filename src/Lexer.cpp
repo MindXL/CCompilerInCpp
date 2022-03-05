@@ -49,6 +49,12 @@ void Lexer::getNextToken() {
     } else if (*cit == ')') {
         cit++;
         type = TokenType::RParenthesis;
+    } else if (*cit == '{') {
+        cit++;
+        type = TokenType::LBrace;
+    } else if (*cit == '}') {
+        cit++;
+        type = TokenType::RBrace;
     } else if (*cit == ';') {
         cit++;
         type = TokenType::Semicolon;

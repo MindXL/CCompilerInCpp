@@ -16,6 +16,7 @@ namespace CCC {
         Add, Sub, Mul, Div,
         Num,
         LParenthesis, RParenthesis,
+        LBrace, RBrace,
         Identifier,
         Semicolon,
         Assignment,

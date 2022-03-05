@@ -22,7 +22,11 @@ TEST_CASE("Lexer", "[Lexer]") {
     };
 
     REQUIRE(testLexer("  1+ 2-  3   * 4 /5;") == "1+2-3*4/5;");    // regular use of binary operator
-    REQUIRE(testLexer("1 +(2 - 3 )*4/5;") == "1+(2-3)*4/5;");    // parentheses
+
+    SECTION("Parentheses") {
+        REQUIRE(testLexer("1 +(2 - 3 )*4/5;") == "1+(2-3)*4/5;");
+    }
+
     REQUIRE(testLexer("1 + 12;") == "1+12;");    // nums bigger than 9
     REQUIRE(testLexer("1+a/2;") == "1+a/2;");    // identifier(variable)
     REQUIRE(testLexer("ab;") == "ab;");    // complex identifier
@@ -37,6 +41,11 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("a=3; if (a==1) a=1; else a=a*a;") == "a=3;if(a==1)a=1;elsea=a*a;");
         REQUIRE(testLexer("a=3; if (a==1) a=1; else if(a==2)a=2;else a=a*a;") ==
                 "a=3;if(a==1)a=1;elseif(a==2)a=2;elsea=a*a;");
+    }
+
+    SECTION("Braces") {
+        REQUIRE(testLexer("a=3; if (a==1) {a=1;} else if(a==2){a=2;}else {a=a*a;a=0;}") ==
+                "a=3;if(a==1){a=1;}elseif(a==2){a=2;}else{a=a*a;a=0;}");
     }
 }
 
@@ -92,5 +101,13 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("a=3; if (a==1) a=1; else a=a*a;") == "a=3;if(a==1)a=1;else a=a*a;");
         REQUIRE(testParser("a=3; if (a==1) a=1; else if(a==2)a=2;else a=a*a;") ==
                 "a=3;if(a==1)a=1;else if(a==2)a=2;else a=a*a;");
+    }
+
+    SECTION("Braces") {
+        REQUIRE(testParser("a=3; if (a==1) {a=1;} else if(a==2){a=2;}else {a=a*a;a=0;}a=100;") ==
+                "a=3;if(a==1){a=1;}else if(a==2){a=2;}else {a=a*a;a=0;}a=100;");
+        REQUIRE(testParser("a=3; if (a==1) {a=1;} else {if(a==2){a=2;}else {a=a*a;a=0;}a=100;}") ==
+                "a=3;if(a==1){a=1;}else {if(a==2){a=2;}else {a=a*a;a=0;}a=100;}");
+        REQUIRE(testParser("a=1;if(a==1)a=2;else {a=3;}") == "a=1;if(a==1)a=2;else {a=3;}");
     }
 }

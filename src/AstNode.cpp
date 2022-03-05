@@ -14,6 +14,10 @@ void StatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitStatementNode(this);
 }
 
+void BlockStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitBlockStatementNode(this);
+}
+
 void IfStatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitIfStatementNode(this);
 }

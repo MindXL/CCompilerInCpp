@@ -18,6 +18,8 @@ namespace CCC {
     private:
         void visitStatementNode(StatementNode *p_node) override;
 
+        void visitBlockStatementNode(BlockStatementNode *p_node) override;
+
         void visitIfStatementNode(IfStatementNode *p_node) override;
 
         void visitAssignmentNode(AssignmentNode *p_node) override;

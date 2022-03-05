@@ -54,6 +54,12 @@ void CodeGenerator::visitStatementNode(StatementNode *p_node) {
     p_node->left->accept(this);
 }
 
+void CodeGenerator::visitBlockStatementNode(BlockStatementNode *p_node) {
+    for (const auto &stmt:p_node->statements) {
+        stmt->accept(this);
+    }
+}
+
 void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
     using std::cout, std::endl;
 
