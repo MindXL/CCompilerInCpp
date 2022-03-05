@@ -177,6 +177,12 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
             p_node = std::make_shared<IdentifierNode>(identifier ? identifier : registerLocal(name));
             break;
         }
+        case TokenType::Eof: {
+            auto &p_token = lexer.p_token;
+            diagnose(lexer.source, lexer.line_head, p_token->location.line_num, p_token->location.col_num,
+                     p_token->content.size(),
+                     "unexpected end of file.");
+        }
         default: {
             auto &p_token = lexer.p_token;
             diagnose(lexer.source, lexer.line_head, p_token->location.line_num, p_token->location.col_num,
