@@ -6,10 +6,12 @@
 #define CCOMPILERINCPP_ASTNODE_H
 
 #include <memory>
-#include <string_view>
+#include <string>
 #include <list>
 
 namespace CCC {
+    class IdentifierNode;
+
     class AstVisitor;
 
     class AstNode {
@@ -19,10 +21,10 @@ namespace CCC {
 
     class Identifier {
     public:
-        std::string_view name;
+        std::string name;
         int offset{-1};    // should always be negative
 
-        explicit Identifier(std::string_view &name) : name{name} {}
+        explicit Identifier(std::string &name) : name{name} {}
     };
 
     class ProgramNode : public AstNode {
@@ -65,8 +67,6 @@ namespace CCC {
 
         void accept(AstVisitor *p_visitor) override;
     };
-
-    class IdentifierNode;
 
     class AssignmentNode : public AstNode {
     public:

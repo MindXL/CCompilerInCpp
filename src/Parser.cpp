@@ -179,14 +179,12 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
         }
         case TokenType::Eof: {
             auto &p_token = lexer.p_token;
-            diagnose(lexer.source, lexer.line_head, p_token->location.line_num, p_token->location.col_num,
-                     p_token->content.size(),
+            diagnose(lexer.line, p_token->location.n_line, lexer.line.length(), 0,
                      "unexpected end of file.");
         }
         default: {
             auto &p_token = lexer.p_token;
-            diagnose(lexer.source, lexer.line_head, p_token->location.line_num, p_token->location.col_num,
-                     p_token->content.size(),
+            diagnose(lexer.line, p_token->location.n_line, p_token->location.start_pos, p_token->content.length(),
                      "grammar around this token '", p_token->content, "' is not supported.");
         }
     }
@@ -194,12 +192,12 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
     return p_node;
 }
 
-std::shared_ptr<Identifier> Parser::findLocal(std::string_view &name) {
+std::shared_ptr<Identifier> Parser::findLocal(std::string &name) {
     auto cit = local_map.find(name);
     return cit == local_map.cend() ? nullptr : cit->second;
 }
 
-std::shared_ptr<Identifier> Parser::registerLocal(std::string_view &name) {
+std::shared_ptr<Identifier> Parser::registerLocal(std::string &name) {
     auto p_local = std::make_shared<Identifier>(name);
     p_locals->emplace_back(p_local);
     local_map.emplace(name, p_local);

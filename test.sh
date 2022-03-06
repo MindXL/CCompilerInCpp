@@ -8,12 +8,8 @@ separate() {
 }
 
 separate
-echo "Enter source code below:"
-separate
-read -r source
-separate
 
-if ! result_s=$(./ccc "${source}"); then
+if ! result_s=$(./ccc ../test.c); then
   exit
 fi
 

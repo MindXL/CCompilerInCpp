@@ -9,104 +9,133 @@
 
 using namespace CCC;
 
+Lexer::Lexer(const char *filename) : ifs{filename, std::ios::in} {
+    if (!ifs.is_open()) {
+        std::cerr << "failed to open file " << filename << std::endl;
+        exit(1);
+    }
+    next();
+    getNextToken();
+}
+
+Lexer::~Lexer() {
+    ifs.close();
+}
+
 bool Lexer::isEnd() {
-    return cit == source.cend();
+    return ifs.eof() && cit == line.cend();
 }
 
 void Lexer::getNextToken() {
-    /// skip the whitespace
-    while (cit != source.cend() && isspace(*cit)) {
-        if (*cit == '\n') {
-            line_num++;
-            line_head = cit;
-            line_head++;
-        }
-        cit++;
+    /// update new line
+    /// skip whitespace
+    while (!isEnd() && (cit == line.cend() || isspace(*cit))) {
+        next();
     }
 
     TokenType type;
-    TokenLocation location{line_num, std::distance(line_head, cit)};
+    const auto start_pos = std::distance(line.cbegin(), cit);
+    assert(start_pos >= 0);    // ensure that count from line.cbegin() to cit.
+    TokenLocation location{n_line, size_t(start_pos)};
 
     int value = 0;
-    const auto start = cit;
+    std::string content;
 
-    if (cit == source.cend()) { type = TokenType::Eof; }
-    else if (*cit == '+') {
-        cit++;
+    if (isEnd()) {
+        type = TokenType::Eof;
+        content = '\0';
+    } else if (*cit == '+') {
+        next();
         type = TokenType::Add;
+        content = '+';
     } else if (*cit == '-') {
-        cit++;
+        next();
         type = TokenType::Sub;
+        content = '-';
     } else if (*cit == '*') {
-        cit++;
+        next();
         type = TokenType::Mul;
+        content = '*';
     } else if (*cit == '/') {
-        cit++;
+        next();
         type = TokenType::Div;
+        content = '/';
     } else if (*cit == '(') {
-        cit++;
+        next();
         type = TokenType::LParenthesis;
+        content = '(';
     } else if (*cit == ')') {
-        cit++;
+        next();
         type = TokenType::RParenthesis;
+        content = ')';
     } else if (*cit == '{') {
-        cit++;
+        next();
         type = TokenType::LBrace;
+        content = '{';
     } else if (*cit == '}') {
-        cit++;
+        next();
         type = TokenType::RBrace;
+        content = '}';
     } else if (*cit == ';') {
-        cit++;
+        next();
         type = TokenType::Semicolon;
+        content = ';';
     } else if (*cit == '=') {
-        cit++;
-        if (peekChar() == '=') {
+        next();
+        if (*cit == '=') {
+            next();
             type = TokenType::EQ;
-            cit++;
+            content = "==";
         } else {
             type = TokenType::Assignment;
+            content = '=';
         }
     } else if (*cit == '!') {
-        cit++;
-        if (peekChar() == '=') {
+        next();
+        if (*cit == '=') {
+            next();
             type = TokenType::NE;
-            cit++;
+            content = "!=";
         } else {
-            diagnose(source, line_head, location.line_num, location.col_num, p_token->content.size(),
-                     "unexpected '", *cit, '\'');
+            // TODO: consider to do recursive getNextToken() and use those token's content as info.
+            diagnose(line, location.n_line, location.start_pos + 1, 1,
+                     "unexpected '", *std::next(cit), '\'');
         }
     } else if (*cit == '>') {
-        cit++;
-        if (peekChar() == '=') {
+        next();
+        if (*cit == '=') {
+            next();
             type = TokenType::GE;
-            cit++;
+            content = ">=";
         } else {
             type = TokenType::GT;
+            content = '>';
         }
     } else if (*cit == '<') {
-        cit++;
-        if (peekChar() == '=') {
+        next();
+        if (*cit == '=') {
+            next();
             type = TokenType::LE;
-            cit++;
+            content = "<=";
         } else {
             type = TokenType::LT;
+            content = '<';
         }
     } else if (isdigit(*cit)) {
         type = TokenType::Num;
         std::stringstream ss;
         do {
             ss << *cit;
-            cit++;
+            content += *cit;
+            next();
         } while (!isEnd() && isdigit(*cit));
         ss >> value;
     } else if (isValidIdentifierLetter()) {
         do {
-            cit++;
+            content += *cit;
+            next();
         } while (!isEnd() && (isValidIdentifierLetter() || isdigit(*cit)));
-        auto content = source.substr(
-                std::distance(source.cbegin(), start),
-                std::distance(start, cit)
-        );
+
         if (content == "if") {
             type = TokenType::IF;
         } else if (content == "else") {
@@ -117,19 +146,11 @@ void Lexer::getNextToken() {
             type = TokenType::Identifier;
         }
     } else {
-        diagnose(source, line_head, location.line_num, location.col_num, p_token->content.size(),
+        diagnose(line, location.n_line, location.start_pos, 1,
                  "unexpected '", *cit, '\'');
     }
 
-    p_token = std::make_shared<Token>(
-            type,
-            value,
-            source.substr(
-                    std::distance(source.cbegin(), start),
-                    std::distance(start, cit)
-            ),
-            location
-    );
+    p_token = std::make_shared<Token>(type, value, content, location);
 }
 
 void Lexer::expectToken(TokenType type) {
@@ -153,22 +174,27 @@ void Lexer::expectToken(TokenType type) {
             default:
                 assert(0);
         }
-        const auto&[line_num, col_num]=p_token->location;
-        diagnose(source, line_head, line_num, col_num, 0,
+        const auto &location = p_token->location;
+        diagnose(line, location.n_line, location.start_pos, p_token->content.length(),
                  "expected '", expected, '\'');
     }
 }
 
+void Lexer::next() {
+    // cit should never been directly altered outside this function.
+    if (cit == line.cend()) {
+        cit = line.cbegin();
+        line.clear();
+        for (auto ch = ifs.get(); ch != '\n' && ch != EOF; ch = ifs.get()) {
+            line += char(ch);
+        }
+        line.shrink_to_fit();
+        n_line++;
+    } else {
+        cit++;
+    }
+}
 
 bool Lexer::isValidIdentifierLetter() {
     return ('A' <= *cit && *cit <= 'Z') || ('a' <= *cit && *cit <= 'z') || *cit == '_';
-}
-
-char Lexer::peekChar() {
-    if (isEnd())
-        return '\0';
-    auto next_it = cit + 1;
-    if (next_it == source.cend())
-        return '\0';
-    return *cit;
 }
