@@ -5,7 +5,9 @@
 #ifndef CCOMPILERINCPP_LEXER_H
 #define CCOMPILERINCPP_LEXER_H
 
-#include <string_view>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <memory>
 
 #include "diagnose.h"
@@ -16,18 +18,24 @@ namespace CCC {
         Add, Sub, Mul, Div,
         Num,
         LParenthesis, RParenthesis,
+        LBrace, RBrace,
         Identifier,
         Semicolon,
         Assignment,
+        EQ, NE, GT, GE, LT, LE,
+
+        IF, ELSE,
+        WHILE,
+
         Eof
     };
 
     struct TokenLocation {
         // 每一个token的位置信息
-        const long line_num;
-        const long col_num;
+        const size_t n_line;    // count from 1
+        const size_t start_pos;    // count from 0
 
-        TokenLocation(long line_num, long col_num) : line_num{line_num}, col_num{col_num} {}
+        TokenLocation(size_t n_line, size_t start_pos) : n_line{n_line}, start_pos{start_pos} {}
 
         TokenLocation(TokenLocation &location) = default;
     };
@@ -36,27 +44,29 @@ namespace CCC {
     public:
         TokenType type;
         int value;
-        std::string_view content;
+        std::string content;
         TokenLocation location;
 
-        Token(TokenType type, int value, std::string_view &&content, TokenLocation &location) :
+        Token(TokenType type, int value, std::string &content, TokenLocation &location) :
                 type{type}, value{value}, content{content}, location{location} {}
     };
 
     class Lexer {
+    private:
+        std::ifstream ifs;
+
     public:
-        std::string_view source;
         std::shared_ptr<Token> p_token;
+        std::string line;
+        size_t n_line{0};    // count from 1
 
     private:
-        std::string_view::const_iterator cit;
+        std::string::const_iterator cit{line.cbegin()};
 
     public:
-        int line_num{0};
-        std::string_view::const_iterator line_head;
+        explicit Lexer(const char *filename);
 
-    public:
-        explicit Lexer(const char *code) : source{code}, cit{source.cbegin()}, line_head{source.cbegin()} {}
+        ~Lexer();
 
         bool isEnd();
 
@@ -65,6 +75,8 @@ namespace CCC {
         void expectToken(TokenType type);
 
     private:
+        void next();
+
         bool isValidIdentifierLetter();
     };
 }

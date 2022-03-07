@@ -6,6 +6,7 @@
 #define CCOMPILERINCPP_PARSER_H
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include "Lexer.h"
@@ -18,7 +19,7 @@ namespace CCC {
     private:
         Lexer &lexer;
         std::list<std::shared_ptr<Identifier>> *p_locals{nullptr};
-        std::unordered_map<std::string_view, std::shared_ptr<Identifier>> local_map;
+        std::unordered_map<std::string, std::shared_ptr<Identifier>> local_map;
 
     public:
         explicit Parser(Lexer &lexer) : lexer{lexer} {}
@@ -32,15 +33,19 @@ namespace CCC {
 
         std::shared_ptr<AstNode> parseAssignmentExpr();
 
+        std::shared_ptr<AstNode> parseEqualityExpr();
+
+        std::shared_ptr<AstNode> parseRelationalExpr();
+
         std::shared_ptr<AstNode> parseAddExpr();
 
         std::shared_ptr<AstNode> parseMulExpr();
 
         std::shared_ptr<AstNode> parsePrimaryExpr();
 
-        std::shared_ptr<Identifier> findLocal(std::string_view &name);
+        std::shared_ptr<Identifier> findLocal(std::string &name);
 
-        std::shared_ptr<Identifier> registerLocal(std::string_view &name);
+        std::shared_ptr<Identifier> registerLocal(std::string &name);
     };
 }
 

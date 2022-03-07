@@ -6,25 +6,25 @@
 #define CCOMPILERINCPP_ASTNODE_H
 
 #include <memory>
-#include <string_view>
+#include <string>
 #include <list>
 
 namespace CCC {
+    class IdentifierNode;
+
     class AstVisitor;
 
     class AstNode {
     public:
-//        virtual ~AstNode() {};
-
         virtual void accept(AstVisitor *p_visitor) = 0;
     };
 
     class Identifier {
     public:
-        std::string_view name;
-        int offset{0};    // should always be negative
+        std::string name;
+        int offset{-1};    // should always be negative
 
-        explicit Identifier(std::string_view &name) : name{name} {}
+        explicit Identifier(std::string &name) : name{name} {}
     };
 
     class ProgramNode : public AstNode {
@@ -44,7 +44,29 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class IdentifierNode;
+    class BlockStatementNode : public AstNode {
+    public:
+        std::list<std::shared_ptr<AstNode>> statements;
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class IfStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<AstNode> then_stmt{nullptr};
+        std::shared_ptr<AstNode> else_stmt{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class WhileStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<AstNode> then_stmt{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
 
     class AssignmentNode : public AstNode {
     public:
@@ -60,10 +82,8 @@ namespace CCC {
     };
 
     enum class BinaryOperator {
-        Add,
-        Sub,
-        Mul,
-        Div
+        Add, Sub, Mul, Div,
+        EQ, NE, GT, GE, LT, LE
     };
 
     class BinaryNode : public AstNode {
@@ -101,10 +121,15 @@ namespace CCC {
 
     class AstVisitor {
     public:
-//        virtual ~AstVisitor(){}
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
         virtual void visitStatementNode(StatementNode *p_node) = 0;
+
+        virtual void visitBlockStatementNode(BlockStatementNode *p_node) = 0;
+
+        virtual void visitIfStatementNode(IfStatementNode *p_node) = 0;
+
+        virtual void visitWhileStatementNode(WhileStatementNode *p_node) = 0;
 
         virtual void visitAssignmentNode(AssignmentNode *p_node) = 0;
 

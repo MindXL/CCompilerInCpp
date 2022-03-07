@@ -15,13 +15,42 @@ void PrintVisitor::visitProgramNode(ProgramNode *p_node) {
 }
 
 void PrintVisitor::visitStatementNode(StatementNode *p_node) {
-    p_node->left->accept(this);
-    this->content.push_back(';');
+    if (p_node->left)
+        p_node->left->accept(this);
+    content += ';';
+}
+
+void PrintVisitor::visitBlockStatementNode(BlockStatementNode *p_node) {
+    content += '{';
+    for (const auto &stmt:p_node->statements) {
+        stmt->accept(this);
+    }
+    content += '}';
+}
+
+void PrintVisitor::visitIfStatementNode(IfStatementNode *p_node) {
+    content += "if";
+    content += '(';
+    p_node->condition_expr->accept(this);
+    content += ')';
+    p_node->then_stmt->accept(this);
+    if (p_node->else_stmt) {
+        content += "else ";
+        p_node->else_stmt->accept(this);
+    }
+}
+
+void PrintVisitor::visitWhileStatementNode(WhileStatementNode *p_node) {
+    content += "while";
+    content += '(';
+    p_node->condition_expr->accept(this);
+    content += ')';
+    p_node->then_stmt->accept(this);
 }
 
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
-    this->content.push_back('=');
+    content += '=';
     p_node->right->accept(this);
 }
 
@@ -29,27 +58,43 @@ void PrintVisitor::visitBinaryNode(BinaryNode *p_node) {
     p_node->left->accept(this);
     switch (p_node->op) {
         case BinaryOperator::Add:
-            this->content.push_back('+');
+            content += '+';
             break;
         case BinaryOperator::Sub:
-            this->content.push_back('-');
+            content += '-';
             break;
         case BinaryOperator::Mul:
-            this->content.push_back('*');
+            content += '*';
             break;
         case BinaryOperator::Div:
-            this->content.push_back('/');
+            content += '/';
             break;
-        default:
-            assert(0);
+        case BinaryOperator::EQ:
+            content += "==";
+            break;
+        case BinaryOperator::NE:
+            content += "!=";
+            break;
+        case BinaryOperator::GT:
+            content += '>';
+            break;
+        case BinaryOperator::GE:
+            content += ">=";
+            break;
+        case BinaryOperator::LT:
+            content += '<';
+            break;
+        case BinaryOperator::LE:
+            content += "<=";
+            break;
     }
     p_node->right->accept(this);
 }
 
 void PrintVisitor::visitConstantNode(ConstantNode *p_node) {
-    this->content.append(std::to_string(p_node->value));
+    content += std::to_string(p_node->value);
 }
 
 void PrintVisitor::visitIdentifierNode(IdentifierNode *p_node) {
-    this->content.append(p_node->local->name);
+    content += p_node->local->name;
 }

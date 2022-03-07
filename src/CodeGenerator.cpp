@@ -41,7 +41,7 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
 
     for (const auto &statement:p_node->statements) {
         statement->accept(this);
-        assert(this->stack_level == 0);
+        assert(stack_level == 0);
     }
 
     /* 函数结束 */
@@ -51,7 +51,51 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
 }
 
 void CodeGenerator::visitStatementNode(StatementNode *p_node) {
-    p_node->left->accept(this);
+    if (p_node->left)
+        p_node->left->accept(this);
+}
+
+void CodeGenerator::visitBlockStatementNode(BlockStatementNode *p_node) {
+    for (const auto &stmt:p_node->statements) {
+        stmt->accept(this);
+    }
+}
+
+void CodeGenerator::visitIfStatementNode(IfStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl;
+    if (p_node->else_stmt) {
+        // 如果条件为假且有else语句则先跳else语句
+        cout << "\tje .L" << n << ".else" << endl;
+    } else {
+        // 如果条件为假且无else语句则跳if语句结束
+        cout << "\tje .L" << n << ".end" << endl;
+    }
+    p_node->then_stmt->accept(this);
+    cout << "\tjmp .L" << n << ".end" << endl;
+    if (p_node->else_stmt) {
+        cout << ".L" << n << ".else:" << endl;
+        p_node->else_stmt->accept(this);
+    }
+    cout << ".L" << n << ".end:" << endl;
+}
+
+void CodeGenerator::visitWhileStatementNode(WhileStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    cout << ".L" << n << ".begin:" << endl;
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl
+         << "\tje .L" << n << ".end" << endl;
+    p_node->then_stmt->accept(this);
+    cout << "\tjmp .L" << n << ".begin" << endl
+         << ".L" << n << ".end:" << endl;
 }
 
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
@@ -60,19 +104,22 @@ void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
     /// x86
     assert(p_node->left != nullptr);
     cout << "\tlea " << p_node->left->local->offset << "(%rbp), %rax" << endl;    // 取变量地址至rax
-    this->pushRAX();    // rax（变量的地址）入栈
+    pushRAX();    // rax（变量的地址）入栈
     p_node->right->accept(this);    // 计算赋值运算符的右操作数并取至rax
-    this->popTo("%rdi");    // 变量的地址弹出至rdi
+    popTo("%rdi");    // 变量的地址弹出至rdi
     cout << "\tmov %rax, (%rdi)" << endl;    // 右操作数存入变量的地址处
 }
 
 void CodeGenerator::visitBinaryNode(BinaryNode *p_node) {
     using std::cout, std::endl;
 
+    // 右操作数在rax
     p_node->right->accept(this);
-    this->pushRAX();
+    pushRAX();
+
+    // 左操作数在rdi
     p_node->left->accept(this);
-    this->popTo("%rdi");
+    popTo("%rdi");
 
     switch (p_node->op) {
         case BinaryOperator::Add:
@@ -88,8 +135,36 @@ void CodeGenerator::visitBinaryNode(BinaryNode *p_node) {
             cout << "\tcqo" << endl
                  << "\tidiv %rdi" << endl;
             break;
-        default:
-            assert(0);
+        case BinaryOperator::EQ:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsete %al" << endl
+                 << "\tmovzb %al, %rax" << endl;    // z: 扩展; b: 单字节
+            break;
+        case BinaryOperator::NE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetne %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::GT:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetg %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::GE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetge %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::LT:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetl %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
+        case BinaryOperator::LE:
+            cout << "\tcmp %rdi, %rax" << endl
+                 << "\tsetle %al" << endl
+                 << "\tmovzb %al, %rax" << endl;
+            break;
     }
 }
 
@@ -99,12 +174,12 @@ void CodeGenerator::visitConstantNode(ConstantNode *p_node) {
 
 void CodeGenerator::pushRAX() {
     std::cout << "\tpush %rax" << std::endl;
-    this->stack_level++;
+    stack_level++;
 }
 
 void CodeGenerator::popTo(const char *reg) {
     std::cout << "\tpop " << reg << std::endl;
-    this->stack_level--;
+    stack_level--;
 }
 
 void CodeGenerator::visitIdentifierNode(IdentifierNode *p_node) {
