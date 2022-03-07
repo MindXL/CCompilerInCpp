@@ -14,8 +14,6 @@ Lexer::Lexer(const char *filename) : ifs{filename, std::ios::in} {
         std::cerr << "failed to open file " << filename << std::endl;
         exit(1);
     }
-    next();
-    getNextToken();
 }
 
 Lexer::~Lexer() {
@@ -29,7 +27,7 @@ bool Lexer::isEnd() {
 void Lexer::getNextToken() {
     /// update new line
     /// skip whitespace
-    while (!isEnd() && (cit == line.cend() || isspace(*cit))) {
+    while (!isEnd() && (*cit == '\0' || cit == line.cend() || isspace(*cit))) {
         next();
     }
 
@@ -183,12 +181,12 @@ void Lexer::expectToken(TokenType type) {
 void Lexer::next() {
     // cit should never been directly altered outside this function.
     if (cit == line.cend()) {
-        cit = line.cbegin();
         line.clear();
         for (auto ch = ifs.get(); ch != '\n' && ch != EOF; ch = ifs.get()) {
             line += char(ch);
         }
         line.shrink_to_fit();
+        cit = line.cbegin();
         n_line++;
     } else {
         cit++;

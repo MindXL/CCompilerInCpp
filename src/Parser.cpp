@@ -87,9 +87,9 @@ std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
 
 std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
     auto left = parseRelationalExpr();
-    auto &type = lexer.p_token->type;
-    while (type == TokenType::EQ || type == TokenType::NE) {
-        BinaryOperator op = type == TokenType::EQ ? BinaryOperator::EQ : BinaryOperator::NE;
+    auto &p_token = lexer.p_token;
+    while (p_token->type == TokenType::EQ || p_token->type == TokenType::NE) {
+        BinaryOperator op = p_token->type == TokenType::EQ ? BinaryOperator::EQ : BinaryOperator::NE;
         lexer.getNextToken();
         auto p_node = std::make_shared<BinaryNode>(op, std::move(left), parseEqualityExpr());
         left = p_node;
@@ -99,10 +99,11 @@ std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
 
 std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
     auto left = parseAddExpr();
-    auto &type = lexer.p_token->type;
-    while (type == TokenType::GT || type == TokenType::GE || type == TokenType::LT || type == TokenType::LE) {
+    auto &p_token = lexer.p_token;
+    while (p_token->type == TokenType::GT || p_token->type == TokenType::GE || p_token->type == TokenType::LT ||
+           p_token->type == TokenType::LE) {
         BinaryOperator op;
-        switch (type) {
+        switch (p_token->type) {
             case TokenType::GT:
                 op = BinaryOperator::GT;
                 break;
@@ -128,9 +129,9 @@ std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
 std::shared_ptr<AstNode> Parser::parseAddExpr() {
     auto left = parseMulExpr();
 
-    auto &type = lexer.p_token->type;
-    while (type == TokenType::Add || type == TokenType::Sub) {
-        BinaryOperator op = type == TokenType::Add ? BinaryOperator::Add : BinaryOperator::Sub;
+    auto &p_token = lexer.p_token;
+    while (p_token->type == TokenType::Add || p_token->type == TokenType::Sub) {
+        BinaryOperator op = p_token->type == TokenType::Add ? BinaryOperator::Add : BinaryOperator::Sub;
         lexer.getNextToken();
         auto p_node = std::make_shared<BinaryNode>(
                 op,
@@ -146,9 +147,9 @@ std::shared_ptr<AstNode> Parser::parseAddExpr() {
 std::shared_ptr<AstNode> Parser::parseMulExpr() {
     auto left = parsePrimaryExpr();
 
-    auto &type = lexer.p_token->type;
-    while (type == TokenType::Mul || type == TokenType::Div) {
-        BinaryOperator op = type == TokenType::Mul ? BinaryOperator::Mul : BinaryOperator::Div;
+    auto &p_token = lexer.p_token;
+    while (p_token->type == TokenType::Mul || p_token->type == TokenType::Div) {
+        BinaryOperator op = p_token->type == TokenType::Mul ? BinaryOperator::Mul : BinaryOperator::Div;
         lexer.getNextToken();
 
         auto p_node = std::make_shared<BinaryNode>(op, std::move(left), parseMulExpr());

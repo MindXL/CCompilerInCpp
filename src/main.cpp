@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
 
     const char *filename = argv[1];
     Lexer lexer{filename};
+    lexer.getNextToken();
 
     Parser parser{lexer};
     CodeGenerator gen;

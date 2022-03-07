@@ -5,13 +5,21 @@
 #include "PrintVisitor.h"
 
 #include <string>
+#include <fstream>
+#include <filesystem>
 
 using namespace CCC;
 using namespace std;
 
+const char*testfile="test.c";
+
 TEST_CASE("Lexer", "[Lexer]") {
-    auto testLexer = [](const string &source) {
-        Lexer lexer{source.c_str()};
+    auto testLexer = [](const char*source) {
+        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
+        fs<<source;
+        fs.close();
+
+        Lexer lexer{testfile};
         string result;
 
         while (!lexer.isEnd()) {
@@ -56,11 +64,17 @@ TEST_CASE("Lexer", "[Lexer]") {
     SECTION("Null Statement") {
         REQUIRE(testLexer("a=1;;a;") == "a=1;;a;");
     }
+
+    filesystem::remove(testfile);
 }
 
 TEST_CASE("Parser", "[Parser]") {
-    auto testParser = [](const string &source) {
-        Lexer lexer{source.c_str()};
+    auto testParser = [](const char*source) {
+        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
+        fs<<source;
+        fs.close();
+
+        Lexer lexer{testfile};
         lexer.getNextToken();
 
         Parser parser{lexer};
@@ -128,4 +142,6 @@ TEST_CASE("Parser", "[Parser]") {
     SECTION("Null Statement") {
         REQUIRE(testParser("a=1;;a;") == "a=1;;a;");
     }
+
+    filesystem::remove(testfile);
 }
