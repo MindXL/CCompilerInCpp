@@ -25,10 +25,8 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             auto p_node = std::make_shared<IfStatementNode>();
             lexer.getNextToken();
             lexer.expectToken(TokenType::LParenthesis);
-            lexer.getNextToken();
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            lexer.getNextToken();
             p_node->then_stmt = parseStatementExpr();
             if (p_token->type == TokenType::ELSE) {
                 lexer.getNextToken();
@@ -40,10 +38,8 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             auto p_node = std::make_shared<WhileStatementNode>();
             lexer.getNextToken();
             lexer.expectToken(TokenType::LParenthesis);
-            lexer.getNextToken();
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            lexer.getNextToken();
             p_node->then_stmt = parseStatementExpr();
             return p_node;
         }
@@ -52,14 +48,10 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             lexer.getNextToken();
             p_node->then_stmt = parseStatementExpr();
             lexer.expectToken(TokenType::WHILE);
-            lexer.getNextToken();
             lexer.expectToken(TokenType::LParenthesis);
-            lexer.getNextToken();
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            lexer.getNextToken();
             lexer.expectToken(TokenType::Semicolon);
-            lexer.getNextToken();
             return p_node;
         }
         case TokenType::LBrace: {
@@ -69,7 +61,6 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
                 p_node->statements.emplace_back(parseStatementExpr());
             }
             lexer.expectToken(TokenType::RBrace);
-            lexer.getNextToken();
             return p_node;
         }
         default: {
@@ -77,7 +68,6 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
                     p_token->type != TokenType::Semicolon ? parseExpr() : nullptr
             );
             lexer.expectToken(TokenType::Semicolon);
-            lexer.getNextToken();
             return p_node;
         }
     }
@@ -185,12 +175,14 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
         }
         case TokenType::Num: {
             p_node = std::make_shared<ConstantNode>(lexer.p_token->value);
+            lexer.getNextToken();
             break;
         }
         case TokenType::Identifier: {
             auto name = lexer.p_token->content;
             auto identifier = findLocal(name);
             p_node = std::make_shared<IdentifierNode>(identifier ? identifier : registerLocal(name));
+            lexer.getNextToken();
             break;
         }
         case TokenType::Eof: {
@@ -204,7 +196,6 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
                      "grammar around this token '", p_token->content, "' is not supported.");
         }
     }
-    lexer.getNextToken();
     return p_node;
 }
 

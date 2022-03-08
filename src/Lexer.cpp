@@ -154,8 +154,7 @@ void Lexer::getNextToken() {
 }
 
 void Lexer::expectToken(TokenType type) {
-    // This function won't pass the current token.
-    // After 'expectToken', 'getNextToken' is needed provided to pass the current token.
+    // This function will pass the current token.
     if (p_token->type != type) {
         char expected{'\0'};
         switch (type) {
@@ -178,6 +177,7 @@ void Lexer::expectToken(TokenType type) {
         diagnose(line, location.n_line, location.start_pos, p_token->content.length(),
                  "expected '", expected, '\'');
     }
+    getNextToken();
 }
 
 void Lexer::next() {
