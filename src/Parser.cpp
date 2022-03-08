@@ -165,6 +165,7 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
         case TokenType::LParenthesis: {
             lexer.getNextToken();
             p_node = parseExpr();
+            std::dynamic_pointer_cast<PWAstNode>(p_node)->wrapped = true;
             lexer.expectToken(TokenType::RParenthesis);
             break;
         }

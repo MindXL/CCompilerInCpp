@@ -11,12 +11,12 @@
 using namespace CCC;
 using namespace std;
 
-const char*testfile="test.c";
+const char *testfile = "test.c";
 
 TEST_CASE("Lexer", "[Lexer]") {
-    auto testLexer = [](const char*source) {
-        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
-        fs<<source;
+    auto testLexer = [](const char *source) {
+        std::fstream fs(testfile, std::ios::out | std::ios::trunc);
+        fs << source;
         fs.close();
 
         Lexer lexer{testfile};
@@ -69,9 +69,9 @@ TEST_CASE("Lexer", "[Lexer]") {
 }
 
 TEST_CASE("Parser", "[Parser]") {
-    auto testParser = [](const char*source) {
-        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
-        fs<<source;
+    auto testParser = [](const char *source) {
+        std::fstream fs(testfile, std::ios::out | std::ios::trunc);
+        fs << source;
         fs.close();
 
         Lexer lexer{testfile};
@@ -97,10 +97,10 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;") == "a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;");
     }
 
-//    SECTION("Parentheses") {
-//        REQUIRE(testParser("(1+2);") == "1+2;");
-//        REQUIRE(testParser("1+(2+3);") == "1+(2+3);");
-//    }
+    SECTION("Parentheses") {
+        REQUIRE(testParser("(1+2);") == "(1+2);");
+        REQUIRE(testParser("1+(2+3);") == "1+(2+3);");
+    }
 
     SECTION("Identifier") {
         REQUIRE(testParser("1+a/2;") == "1+a/2;");    // identifier(variable)

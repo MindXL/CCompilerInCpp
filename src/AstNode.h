@@ -19,6 +19,13 @@ namespace CCC {
         virtual void accept(AstVisitor *p_visitor) = 0;
     };
 
+    class ParenthesesWrappableAstNode : public AstNode {
+    public:
+        bool wrapped{false};
+    };
+
+    using PWAstNode = ParenthesesWrappableAstNode;
+
     class Identifier {
     public:
         std::string name;
@@ -68,7 +75,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class AssignmentNode : public AstNode {
+    class AssignmentNode : public PWAstNode {
     public:
         std::shared_ptr<IdentifierNode> left;
         std::shared_ptr<AstNode> right;
@@ -86,7 +93,7 @@ namespace CCC {
         EQ, NE, GT, GE, LT, LE
     };
 
-    class BinaryNode : public AstNode {
+    class BinaryNode : public PWAstNode {
     public:
         BinaryOperator op;
         std::shared_ptr<AstNode> left;
@@ -101,7 +108,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class ConstantNode : public AstNode {
+    class ConstantNode : public PWAstNode {
     public:
         int value;
 
@@ -110,7 +117,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class IdentifierNode : public AstNode {
+    class IdentifierNode : public PWAstNode {
     public:
         std::shared_ptr<Identifier> local;
 
