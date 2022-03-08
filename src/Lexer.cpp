@@ -140,6 +140,8 @@ void Lexer::getNextToken() {
             type = TokenType::ELSE;
         } else if (content == "while") {
             type = TokenType::WHILE;
+        } else if (content == "do") {
+            type = TokenType::DO;
         } else {
             type = TokenType::Identifier;
         }

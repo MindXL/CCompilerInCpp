@@ -48,6 +48,14 @@ void PrintVisitor::visitWhileStatementNode(WhileStatementNode *p_node) {
     p_node->then_stmt->accept(this);
 }
 
+void PrintVisitor::visitDoWhileStatementNode(DoWhileStatementNode *p_node) {
+    content += "do ";
+    p_node->then_stmt->accept(this);
+    content += "while(";
+    p_node->condition_expr->accept(this);
+    content += ");";
+}
+
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
     content += '=';

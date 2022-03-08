@@ -11,12 +11,12 @@
 using namespace CCC;
 using namespace std;
 
-const char*testfile="test.c";
+const char *testfile = "test.c";
 
 TEST_CASE("Lexer", "[Lexer]") {
-    auto testLexer = [](const char*source) {
-        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
-        fs<<source;
+    auto testLexer = [](const char *source) {
+        std::fstream fs(testfile, std::ios::out | std::ios::trunc);
+        fs << source;
         fs.close();
 
         Lexer lexer{testfile};
@@ -55,6 +55,11 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("a=0;while(a<10){a=a+1;a;}a;") == "a=0;while(a<10){a=a+1;a;}a;");
     }
 
+    SECTION("Do While Statament") {
+        REQUIRE(testLexer("a=0;do a=a+1;while(a<10);") == "a=0;doa=a+1;while(a<10);");
+        REQUIRE(testLexer("a=0;do {a=a+1; a=a+2;}while(a<10);") == "a=0;do{a=a+1;a=a+2;}while(a<10);");
+    }
+
     SECTION("Braces") {
         REQUIRE(testLexer("a=3; if (a==1) {a=1;} else if(a==2){a=2;}else {a=a*a;a=0;}") ==
                 "a=3;if(a==1){a=1;}elseif(a==2){a=2;}else{a=a*a;a=0;}");
@@ -69,9 +74,9 @@ TEST_CASE("Lexer", "[Lexer]") {
 }
 
 TEST_CASE("Parser", "[Parser]") {
-    auto testParser = [](const char*source) {
-        std::fstream fs(testfile,std::ios::out|std::ios::trunc);
-        fs<<source;
+    auto testParser = [](const char *source) {
+        std::fstream fs(testfile, std::ios::out | std::ios::trunc);
+        fs << source;
         fs.close();
 
         Lexer lexer{testfile};
@@ -128,6 +133,11 @@ TEST_CASE("Parser", "[Parser]") {
 
     SECTION("While Statement") {
         REQUIRE(testParser("a=0;while(a<10){a=a+1;a;}a;") == "a=0;while(a<10){a=a+1;a;}a;");
+    }
+
+    SECTION("Do While Statament") {
+        REQUIRE(testParser("a=0;do a=a+1;while(a<10);") == "a=0;do a=a+1;while(a<10);");
+        REQUIRE(testParser("a=0;do {a=a+1; a=a+2;}while(a<10);") == "a=0;do {a=a+1;a=a+2;}while(a<10);");
     }
 
     SECTION("Braces") {

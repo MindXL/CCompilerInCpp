@@ -4,6 +4,7 @@ Statement      := Expr?;
                := if (Expr) Statement
                := if (Expr) Statement else Statement
                := while (Expr) Statement
+               := do Statement while(Expr);
                := {Statement*}
 
 Expr           := AssignmentExpr

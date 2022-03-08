@@ -47,6 +47,21 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             p_node->then_stmt = parseStatementExpr();
             return p_node;
         }
+        case TokenType::DO: {
+            auto p_node = std::make_shared<DoWhileStatementNode>();
+            lexer.getNextToken();
+            p_node->then_stmt = parseStatementExpr();
+            lexer.expectToken(TokenType::WHILE);
+            lexer.getNextToken();
+            lexer.expectToken(TokenType::LParenthesis);
+            lexer.getNextToken();
+            p_node->condition_expr = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            lexer.getNextToken();
+            lexer.expectToken(TokenType::Semicolon);
+            lexer.getNextToken();
+            return p_node;
+        }
         case TokenType::LBrace: {
             auto p_node = std::make_shared<BlockStatementNode>();
             lexer.getNextToken();

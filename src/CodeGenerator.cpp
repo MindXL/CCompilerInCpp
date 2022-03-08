@@ -98,6 +98,18 @@ void CodeGenerator::visitWhileStatementNode(WhileStatementNode *p_node) {
          << ".L" << n << ".end:" << endl;
 }
 
+void CodeGenerator::visitDoWhileStatementNode(DoWhileStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    cout << ".L" << n << ".begin:" << endl;
+    p_node->then_stmt->accept(this);
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl
+         << "\tjne .L" << n << ".begin" << endl;
+}
+
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
     using std::cout, std::endl;
 
