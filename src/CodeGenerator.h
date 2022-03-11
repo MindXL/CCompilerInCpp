@@ -7,6 +7,10 @@
 
 #include"AstNode.h"
 
+#include <iostream>
+#include <string>
+#include <cassert>
+
 namespace CCC {
     class CodeGenerator : public AstVisitor {
     private:

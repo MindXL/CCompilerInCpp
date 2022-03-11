@@ -4,9 +4,6 @@
 
 #include "Parser.h"
 
-#include <iostream>
-#include <cassert>
-
 using namespace CCC;
 
 std::shared_ptr<ProgramNode> Parser::parse() {

@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <iostream>
+#include <cassert>
 
 #include "Lexer.h"
 #include "AstNode.h"

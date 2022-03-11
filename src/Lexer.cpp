@@ -4,9 +4,6 @@
 
 #include "Lexer.h"
 
-#include <sstream>
-#include <cassert>
-
 using namespace CCC;
 
 Lexer::Lexer(const char *filename) : ifs{filename, std::ios::in} {

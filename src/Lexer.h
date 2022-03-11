@@ -9,6 +9,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <sstream>
+#include <cassert>
 
 #include "diagnose.h"
 

@@ -4,10 +4,6 @@
 
 #include "CodeGenerator.h"
 
-#include <iostream>
-#include <string>
-#include <cassert>
-
 using namespace CCC;
 
 void CodeGenerator::visitProgramNode(ProgramNode *p_node) {

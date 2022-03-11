@@ -4,8 +4,6 @@
 
 #include "PrintVisitor.h"
 
-#include <cassert>
-
 using namespace CCC;
 
 void PrintVisitor::visitProgramNode(ProgramNode *p_node) {
