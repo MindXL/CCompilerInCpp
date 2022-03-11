@@ -28,6 +28,7 @@ namespace CCC {
         explicit Identifier(std::string &name) : name{name} {}
     };
 
+    // TODO: management between function and its namesake
     class ProgramNode : public AstNode {
     public:
         std::list<std::shared_ptr<AstNode>> functions;
@@ -35,6 +36,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
+    // TODO: management between parameters and namesake locals
     class FunctionNode : public AstNode {
     public:
         std::string name;
