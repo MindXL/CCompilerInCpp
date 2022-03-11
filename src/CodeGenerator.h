@@ -12,12 +12,18 @@ namespace CCC {
     private:
         int stack_level{0};
         int n_mnemonic{0};
+        /* x86寄存器 */
+        static constexpr const char *registers[6] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
 
     public:
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
+        static std::string wrapFunctionName(std::string &name);
+
         void visitFunctionNode(FunctionNode *p_node) override;
+
+        void visitFunctionCallNode(FunctionCallNode *p_node) override;
 
         void visitStatementNode(StatementNode *p_node) override;
 

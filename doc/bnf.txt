@@ -37,4 +37,6 @@ MulExpr        := PrimaryExpr
 
 PrimaryExpr    := Num
                := \(Expr\)
-               := Identifier
+               := Identifier(\(Arguments?\))?
+
+Arguments      := AssignmentExpr(,AssignmentExpr)*

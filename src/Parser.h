@@ -30,6 +30,8 @@ namespace CCC {
     private:
         std::shared_ptr<AstNode> parseFunction();
 
+        std::shared_ptr<AstNode> parseFunctionCall(std::shared_ptr<Token> &p_nameToken);
+
         std::shared_ptr<AstNode> parseStatement();
 
         std::shared_ptr<AstNode> parseExpr();

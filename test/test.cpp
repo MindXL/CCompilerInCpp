@@ -13,6 +13,7 @@ using namespace std;
 
 const char *testfile = "test.c";
 
+// TODO: modify test framework
 TEST_CASE("Lexer", "[Lexer]") {
     auto testLexer = [](const char *source) {
         std::fstream fs(testfile, std::ios::out | std::ios::trunc);
@@ -83,6 +84,15 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("func(a, b){}") == "func(a,b){}");
         REQUIRE(testLexer("func(a, b){a=1;b==2;}") == "func(a,b){a=1;b==2;}");
         REQUIRE(testLexer("func(){{}{{}}}") == "func(){{}{{}}}");
+    }
+
+    SECTION("Function Call") {
+        REQUIRE(testLexer("f(n) {n=n+1;} g(n) {n=n+2;} t(){f(1);}") == "f(n){n=n+1;}g(n){n=n+2;}t(){f(1);}");
+        REQUIRE(testLexer("sum(n){sum=0;for(i=0;i<=n;i=i+1){sum=sum+i;}sum;}prog(){sum(100);}") ==
+                "sum(n){sum=0;for(i=0;i<=n;i=i+1){sum=sum+i;}sum;}prog(){sum(100);}");
+        REQUIRE(testLexer("add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}") ==
+                "add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}");
+        //        REQUIRE(testLexer("f(n) {n=n+1;} g(n) {n=n+2;} g(f(1));") == "f(n){n=n+1;}g(n){n=n+2;}g(f(1));");
     }
 
     filesystem::remove(testfile);
@@ -183,6 +193,15 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(testParser("func(a, b){}") == "func(a,b){}");
         REQUIRE(testParser("func(a, b){a=1;b==2;}") == "func(a,b){a=1;b==2;}");
         REQUIRE(testParser("func(){{}{{}}}") == "func(){{}{{}}}");
+    }
+
+    SECTION("Function Call") {
+        REQUIRE(testParser("f(n) {n=n+1;} g(n) {n=n+2;} t(){f(1);}") == "f(n){n=n+1;}g(n){n=n+2;}t(){f(1);}");
+        REQUIRE(testParser("sum(n){sum=0;for(i=0;i<=n;i=i+1){sum=sum+i;}sum;}prog(){sum(100);}") ==
+                "sum(n){sum=0;for(i=0;i<=n;i=i+1){sum=sum+i;}sum;}prog(){sum(100);}");
+        REQUIRE(testParser("add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}") ==
+                "add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}");
+//        REQUIRE(testParser("f(n) {n=n+1;} g(n) {n=n+2;} g(f(1));") == "f(n){n=n+1;}g(n){n=n+2;}g(f(1));");
     }
 
     filesystem::remove(testfile);

@@ -26,7 +26,7 @@ std::shared_ptr<AstNode> Parser::parseFunction() {
     lexer.expectToken(TokenType::Identifier);
     lexer.expectToken(TokenType::LParenthesis);
     if (lexer.p_token->type != TokenType::RParenthesis) {
-        // 有参数
+        // have parameters
         do {
             auto p_token = lexer.p_token;
             auto line = lexer.line;
@@ -47,6 +47,19 @@ std::shared_ptr<AstNode> Parser::parseFunction() {
     }
     lexer.expectToken(TokenType::RBrace);
 
+    return p_node;
+}
+
+std::shared_ptr<AstNode> Parser::parseFunctionCall(std::shared_ptr<Token> &p_nameToken) {
+    auto p_node = std::make_shared<FunctionCallNode>(p_nameToken->content);
+    lexer.expectToken(TokenType::LParenthesis);
+    if (lexer.p_token->type != TokenType::RParenthesis) {
+        // have arguments
+        do {
+            p_node->arguments.emplace_back(parseAssignmentExpr());
+        } while (lexer.p_token->type == TokenType::Comma && lexer.expectToken(TokenType::Comma));
+    }
+    lexer.expectToken(TokenType::RParenthesis);
     return p_node;
 }
 
@@ -227,10 +240,16 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
             break;
         }
         case TokenType::Identifier: {
-            auto name = lexer.p_token->content;
+            auto p_lastToken = lexer.p_token;
+            lexer.getNextToken();
+            if (lexer.p_token->type == TokenType::LParenthesis) {
+                // func call
+                return parseFunctionCall(p_lastToken);
+            }
+
+            auto name = p_lastToken->content;
             auto identifier = findLocal(name);
             p_node = std::make_shared<IdentifierNode>(identifier ? identifier : registerLocal(name));
-            lexer.getNextToken();
             break;
         }
         case TokenType::Eof: {

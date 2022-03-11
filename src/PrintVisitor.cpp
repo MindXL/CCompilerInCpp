@@ -20,7 +20,7 @@ void PrintVisitor::visitFunctionNode(FunctionNode *p_node) {
     for (auto cit = p_node->parameters.cbegin(); cit != p_node->parameters.cend(); cit++) {
         if (cit != p_node->parameters.cbegin())
             content += ',';
-        content += cit->get()->name;
+        content += (*cit)->name;
     }
     content += ')';
     content += '{';
@@ -28,6 +28,17 @@ void PrintVisitor::visitFunctionNode(FunctionNode *p_node) {
         s->accept(this);
     }
     content += '}';
+}
+
+void PrintVisitor::visitFunctionCallNode(FunctionCallNode *p_node) {
+    content += p_node->name;
+    content += '(';
+    for (auto cit = p_node->arguments.cbegin(); cit != p_node->arguments.cend(); cit++) {
+        if (cit != p_node->arguments.cbegin())
+            content += ',';
+        (*cit)->accept(this);
+    }
+    content += ')';
 }
 
 void PrintVisitor::visitStatementNode(StatementNode *p_node) {

@@ -60,6 +60,9 @@ namespace CCC {
         std::string line;
         size_t n_line{0};    // count from 1
 
+        std::shared_ptr<Token> p_lastToken;
+        std::string last_line;
+
     private:
         std::string::const_iterator cit{line.cbegin()};
 

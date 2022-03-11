@@ -47,6 +47,16 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
+    class FunctionCallNode : public AstNode {
+    public:
+        std::string name;
+        std::vector<std::shared_ptr<AstNode>> arguments;
+
+        explicit FunctionCallNode(std::string &name) : name{name} {}
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
     class StatementNode : public AstNode {
     public:
         std::shared_ptr<AstNode> left;
@@ -152,6 +162,8 @@ namespace CCC {
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
         virtual void visitFunctionNode(FunctionNode *p_node) = 0;
+
+        virtual void visitFunctionCallNode(FunctionCallNode *p_node) = 0;
 
         virtual void visitStatementNode(StatementNode *p_node) = 0;
 

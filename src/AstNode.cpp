@@ -14,6 +14,10 @@ void FunctionNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitFunctionNode(this);
 }
 
+void FunctionCallNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitFunctionCallNode(this);
+}
+
 void StatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitStatementNode(this);
 }

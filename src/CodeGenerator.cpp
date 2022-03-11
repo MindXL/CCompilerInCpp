@@ -16,23 +16,24 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
     }
 }
 
+std::string CodeGenerator::wrapFunctionName(std::string &name) {
+#ifdef __linux__
+    /// Linux
+    return name;
+#else
+    /// MacOS
+    return '_' + name;
+#endif
+}
+
 void CodeGenerator::visitFunctionNode(FunctionNode *p_node) {
     using std::cout, std::endl;
 
+    auto &&name{wrapFunctionName(p_node->name)};
     cout << "\t.text" << endl;
-
-    auto &name{p_node->name};
-
     /* 函数开始 */
-#ifdef __linux__
-    /// Linux
     cout << "\t.globl " << name << endl
          << name << ':' << endl;
-#else
-    /// MacOS
-    cout << "\t.globl _" << name << endl
-         << '_' << name << ':' << endl;
-#endif
 
     int stack_size = 0;
     for (const auto &local:p_node->locals) {
@@ -50,8 +51,6 @@ void CodeGenerator::visitFunctionNode(FunctionNode *p_node) {
     cout << "\tsub $" << stack_size << ", %rsp" << endl;
 
     /* parameters */
-    /* x86寄存器 */
-    const char *registers[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8d", "%r9d"};
     for (int i = 0; i < p_node->parameters.size(); i++) {
         cout << "\tmov " << registers[i] << ", " << p_node->parameters.at(i)->offset << "(%rbp)" << endl;
     }
@@ -65,6 +64,21 @@ void CodeGenerator::visitFunctionNode(FunctionNode *p_node) {
     cout << "\tmov %rbp, %rsp" << endl
          << "\tpop %rbp" << endl
          << "\tret" << endl;
+}
+
+void CodeGenerator::visitFunctionCallNode(FunctionCallNode *p_node) {
+    auto &&name{wrapFunctionName(p_node->name)};
+
+    // pass arguments through the registers
+    for (const auto &arg:p_node->arguments) {
+        arg->accept(this);
+        pushRAX();
+    }
+    // TODO: is this extravagant?
+    for (auto i = p_node->arguments.size() - 1; i != decltype(p_node->arguments.size())(0 - 1); i--) {
+        popTo(registers[i]);
+    }
+    std::cout << "\tcall " << name << std::endl;
 }
 
 void CodeGenerator::visitStatementNode(StatementNode *p_node) {
