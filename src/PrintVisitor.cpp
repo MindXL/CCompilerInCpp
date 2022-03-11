@@ -9,9 +9,25 @@
 using namespace CCC;
 
 void PrintVisitor::visitProgramNode(ProgramNode *p_node) {
-    for (const auto &statement:p_node->statements) {
-        statement->accept(this);
+    for (const auto &f:p_node->functions) {
+        f->accept(this);
     }
+}
+
+void PrintVisitor::visitFunctionNode(FunctionNode *p_node) {
+    content += p_node->name;
+    content += '(';
+    for (auto cit = p_node->parameters.cbegin(); cit != p_node->parameters.cend(); cit++) {
+        if (cit != p_node->parameters.cbegin())
+            content += ',';
+        content += cit->get()->name;
+    }
+    content += ')';
+    content += '{';
+    for (const auto &s:p_node->statements) {
+        s->accept(this);
+    }
+    content += '}';
 }
 
 void PrintVisitor::visitStatementNode(StatementNode *p_node) {

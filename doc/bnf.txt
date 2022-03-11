@@ -1,11 +1,15 @@
-Program        := Statement*
+Program        := Function*
+
+Function       := Identifier \(Parameters?\) \{Statement*\}
+
+Parameters     := Identifier (,Identifier)*
 
 Statement      := Expr?;
-               := if (Expr) Statement
-               := if (Expr) Statement else Statement
-               := while (Expr) Statement
-               := do Statement while(Expr);
-               := for (Expr?;Expr?;Expr?) Statement
+               := if \(Expr\) Statement
+               := if \(Expr\) Statement else Statement
+               := while \(Expr\) Statement
+               := do Statement while\(Expr\);
+               := for \(Expr?;Expr?;Expr?\) Statement
                := {Statement*}
 
 Expr           := AssignmentExpr
@@ -24,13 +28,13 @@ RelationalExpr := AddExpr
                := RelationalExpr >= AddExpr
 
 AddExpr        := MulExpr
-               := AddExpr + MulExpr
+               := AddExpr \+ MulExpr
                := AddExpr - MulExpr
 
 MulExpr        := PrimaryExpr
-               := MulExpr * PrimaryExpr
+               := MulExpr \* PrimaryExpr
                := MulExpr / PrimaryExpr
 
 PrimaryExpr    := Num
-               := (Expr)
+               := \(Expr\)
                := Identifier

@@ -11,10 +11,42 @@ using namespace CCC;
 
 std::shared_ptr<ProgramNode> Parser::parse() {
     auto p_node = std::make_shared<ProgramNode>();
-    p_locals = &p_node->locals;    // 绑定变量列表
     while (lexer.p_token->type != TokenType::Eof) {
+        p_node->functions.emplace_back(parseFunction());
+    }
+    return p_node;
+}
+
+std::shared_ptr<AstNode> Parser::parseFunction() {
+    auto p_node = std::make_shared<FunctionNode>();
+    p_locals = &p_node->locals;    // 绑定变量列表
+    local_map.clear();
+
+    p_node->name = lexer.p_token->content;
+    lexer.expectToken(TokenType::Identifier);
+    lexer.expectToken(TokenType::LParenthesis);
+    if (lexer.p_token->type != TokenType::RParenthesis) {
+        // 有参数
+        do {
+            auto p_token = lexer.p_token;
+            auto line = lexer.line;
+            parsePrimaryExpr();
+            auto p_identifier = findLocal(p_token->content);
+            if (!p_identifier) {
+                diagnose(line, p_token->location.n_line, p_token->location.start_pos, p_token->content.length(),
+                         p_token->content, " is not a valid declaration of a parameter.");
+            }
+            p_node->parameters.emplace_back(p_identifier);
+        } while (lexer.p_token->type == TokenType::Comma && lexer.expectToken(TokenType::Comma));
+    }
+    lexer.expectToken(TokenType::RParenthesis);
+
+    lexer.expectToken(TokenType::LBrace);
+    while (lexer.p_token->type != TokenType::RBrace) {
         p_node->statements.emplace_back(parseStatementExpr());
     }
+    lexer.expectToken(TokenType::RBrace);
+
     return p_node;
 }
 

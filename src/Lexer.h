@@ -20,7 +20,7 @@ namespace CCC {
         LParenthesis, RParenthesis,
         LBrace, RBrace,
         Identifier,
-        Semicolon,
+        Semicolon, Comma,
         Assignment,
         EQ, NE, GT, GE, LT, LE,
 
@@ -72,7 +72,7 @@ namespace CCC {
 
         void getNextToken();
 
-        void expectToken(TokenType type);
+        bool expectToken(TokenType type);
 
     private:
         void next();

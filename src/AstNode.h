@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <list>
+#include <vector>
 
 namespace CCC {
     class IdentifierNode;
@@ -29,8 +30,17 @@ namespace CCC {
 
     class ProgramNode : public AstNode {
     public:
-        std::list<std::shared_ptr<AstNode>> statements;
+        std::list<std::shared_ptr<AstNode>> functions;
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class FunctionNode : public AstNode {
+    public:
+        std::string name;
+        std::vector<std::shared_ptr<Identifier>> parameters;
         std::list<std::shared_ptr<Identifier>> locals;
+        std::list<std::shared_ptr<AstNode>> statements;
 
         void accept(AstVisitor *p_visitor) override;
     };
@@ -138,6 +148,8 @@ namespace CCC {
     class AstVisitor {
     public:
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
+
+        virtual void visitFunctionNode(FunctionNode *p_node) = 0;
 
         virtual void visitStatementNode(StatementNode *p_node) = 0;
 

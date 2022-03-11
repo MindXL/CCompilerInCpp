@@ -17,6 +17,8 @@ namespace CCC {
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
+        void visitFunctionNode(FunctionNode *p_node) override;
+
         void visitStatementNode(StatementNode *p_node) override;
 
         void visitBlockStatementNode(BlockStatementNode *p_node) override;
@@ -40,6 +42,9 @@ namespace CCC {
         void pushRAX();
 
         void popTo(const char *reg);
+
+        // 将size向上调整至align的整数倍
+        static constexpr int align(int size, int align);
     };
 }
 

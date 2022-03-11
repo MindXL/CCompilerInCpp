@@ -77,6 +77,14 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("a=1;;a;") == "a=1;;a;");
     }
 
+    SECTION("Function") {
+        REQUIRE(testLexer("func(){}") == "func(){}");
+        REQUIRE(testLexer("func(a){}") == "func(a){}");
+        REQUIRE(testLexer("func(a, b){}") == "func(a,b){}");
+        REQUIRE(testLexer("func(a, b){a=1;b==2;}") == "func(a,b){a=1;b==2;}");
+        REQUIRE(testLexer("func(){{}{{}}}") == "func(){{}{{}}}");
+    }
+
     filesystem::remove(testfile);
 }
 
@@ -98,6 +106,7 @@ TEST_CASE("Parser", "[Parser]") {
         return visitor.content;
     };
 
+    /*
     SECTION("Binary Operators") {
         REQUIRE(testParser("1+2;") == "1+2;");
         REQUIRE(testParser("1-2;") == "1-2;");
@@ -165,6 +174,15 @@ TEST_CASE("Parser", "[Parser]") {
 
     SECTION("Null Statement") {
         REQUIRE(testParser("a=1;;a;") == "a=1;;a;");
+    }
+    */
+
+    SECTION("Function") {
+        REQUIRE(testParser("func(){}") == "func(){}");
+        REQUIRE(testParser("func(a){}") == "func(a){}");
+        REQUIRE(testParser("func(a, b){}") == "func(a,b){}");
+        REQUIRE(testParser("func(a, b){a=1;b==2;}") == "func(a,b){a=1;b==2;}");
+        REQUIRE(testParser("func(){{}{{}}}") == "func(){{}{{}}}");
     }
 
     filesystem::remove(testfile);

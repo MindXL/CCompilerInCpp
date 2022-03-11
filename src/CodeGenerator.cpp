@@ -5,23 +5,33 @@
 #include "CodeGenerator.h"
 
 #include <iostream>
+#include <string>
 #include <cassert>
 
 using namespace CCC;
 
 void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
+    for (const auto &f:p_node->functions) {
+        f->accept(this);
+    }
+}
+
+void CodeGenerator::visitFunctionNode(FunctionNode *p_node) {
     using std::cout, std::endl;
+
     cout << "\t.text" << endl;
+
+    auto &name{p_node->name};
 
     /* 函数开始 */
 #ifdef __linux__
     /// Linux
-    cout << "\t.globl prog" << endl
-         << "prog:" << endl;
+    cout << "\t.globl " << name << endl
+         << name << ':' << endl;
 #else
     /// MacOS
-    cout << "\t.globl _prog" << endl
-              << "_prog:" << endl;
+    cout << "\t.globl _" << name << endl
+         << '_' << name << ':' << endl;
 #endif
 
     int stack_size = 0;
@@ -29,9 +39,9 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
         stack_size += 8;
         local->offset = stack_size * -1;
     }
+    stack_size = align(stack_size, 16);
 
     /* rbp 栈基指针, rsp 栈顶指针 */
-
     // 修改rsp的地址指向rbp
     cout << "\tpush %rbp" << endl
          << "\tmov %rsp, %rbp" << endl;
@@ -39,8 +49,15 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
     // 开辟32字节的栈空间
     cout << "\tsub $" << stack_size << ", %rsp" << endl;
 
-    for (const auto &statement:p_node->statements) {
-        statement->accept(this);
+    /* parameters */
+    /* x86寄存器 */
+    const char *registers[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8d", "%r9d"};
+    for (int i = 0; i < p_node->parameters.size(); i++) {
+        cout << "\tmov " << registers[i] << ", " << p_node->parameters.at(i)->offset << "(%rbp)" << endl;
+    }
+
+    for (const auto &s:p_node->statements) {
+        s->accept(this);
         assert(stack_level == 0);
     }
 
@@ -220,4 +237,8 @@ void CodeGenerator::visitIdentifierNode(IdentifierNode *p_node) {
     /// x86
     cout << "\tlea " << p_node->local->offset << "(%rbp), %rax" << endl    // 取变量地址至rax
          << "\tmov (%rax), %rax" << endl;    // 间接寻址
+}
+
+constexpr int CodeGenerator::align(int size, int align) {
+    return (size + align - 1) / align * align;
 }

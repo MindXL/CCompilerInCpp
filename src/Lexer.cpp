@@ -78,6 +78,10 @@ void Lexer::getNextToken() {
         next();
         type = TokenType::Semicolon;
         content = ';';
+    } else if (*cit == ',') {
+        next();
+        type = TokenType::Comma;
+        content = ',';
     } else if (*cit == '=') {
         next();
         if (*cit == '=') {
@@ -155,7 +159,7 @@ void Lexer::getNextToken() {
     p_token = std::make_shared<Token>(type, value, content, location);
 }
 
-void Lexer::expectToken(TokenType type) {
+bool Lexer::expectToken(TokenType type) {
     // This function will pass the current token.
     if (p_token->type != type) {
         char expected{'\0'};
@@ -180,6 +184,7 @@ void Lexer::expectToken(TokenType type) {
                  "expected '", expected, '\'');
     }
     getNextToken();
+    return true;
 }
 
 void Lexer::next() {
