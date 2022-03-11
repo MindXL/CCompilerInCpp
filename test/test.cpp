@@ -78,7 +78,7 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("a=1;;a;") == "a=1;;a;");
     }
 
-    SECTION("Function") {
+    SECTION("Function Definition") {
         REQUIRE(testLexer("func(){}") == "func(){}");
         REQUIRE(testLexer("func(a){}") == "func(a){}");
         REQUIRE(testLexer("func(a, b){}") == "func(a,b){}");
@@ -187,7 +187,7 @@ TEST_CASE("Parser", "[Parser]") {
     }
     */
 
-    SECTION("Function") {
+    SECTION("Function Definition") {
         REQUIRE(testParser("func(){}") == "func(){}");
         REQUIRE(testParser("func(a){}") == "func(a){}");
         REQUIRE(testParser("func(a, b){}") == "func(a,b){}");

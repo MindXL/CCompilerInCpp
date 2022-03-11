@@ -14,7 +14,7 @@ void PrintVisitor::visitProgramNode(ProgramNode *p_node) {
     }
 }
 
-void PrintVisitor::visitFunctionNode(FunctionNode *p_node) {
+void PrintVisitor::visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) {
     content += p_node->name;
     content += '(';
     for (auto cit = p_node->parameters.cbegin(); cit != p_node->parameters.cend(); cit++) {

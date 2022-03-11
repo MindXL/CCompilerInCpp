@@ -12,13 +12,13 @@ using namespace CCC;
 std::shared_ptr<ProgramNode> Parser::parse() {
     auto p_node = std::make_shared<ProgramNode>();
     while (lexer.p_token->type != TokenType::Eof) {
-        p_node->functions.emplace_back(parseFunction());
+        p_node->functions.emplace_back(parseFunctionDefinition());
     }
     return p_node;
 }
 
-std::shared_ptr<AstNode> Parser::parseFunction() {
-    auto p_node = std::make_shared<FunctionNode>();
+std::shared_ptr<AstNode> Parser::parseFunctionDefinition() {
+    auto p_node = std::make_shared<FunctionDefinitionNode>();
     p_locals = &p_node->locals;    // 绑定变量列表
     local_map.clear();
 

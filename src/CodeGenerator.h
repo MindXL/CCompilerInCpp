@@ -21,7 +21,7 @@ namespace CCC {
     private:
         static std::string wrapFunctionName(std::string &name);
 
-        void visitFunctionNode(FunctionNode *p_node) override;
+        void visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) override;
 
         void visitFunctionCallNode(FunctionCallNode *p_node) override;
 

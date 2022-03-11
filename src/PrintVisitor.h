@@ -16,7 +16,7 @@ namespace CCC {
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
-        void visitFunctionNode(FunctionNode *p_node) override;
+        void visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) override;
 
         void visitFunctionCallNode(FunctionCallNode *p_node) override;
 

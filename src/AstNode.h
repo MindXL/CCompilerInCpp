@@ -37,7 +37,7 @@ namespace CCC {
     };
 
     // TODO: management between parameters and namesake locals
-    class FunctionNode : public AstNode {
+    class FunctionDefinitionNode : public AstNode {
     public:
         std::string name;
         std::vector<std::shared_ptr<Identifier>> parameters;
@@ -161,7 +161,7 @@ namespace CCC {
     public:
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
-        virtual void visitFunctionNode(FunctionNode *p_node) = 0;
+        virtual void visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) = 0;
 
         virtual void visitFunctionCallNode(FunctionCallNode *p_node) = 0;
 

@@ -10,8 +10,8 @@ void ProgramNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitProgramNode(this);
 }
 
-void FunctionNode::accept(AstVisitor *p_visitor) {
-    p_visitor->visitFunctionNode(this);
+void FunctionDefinitionNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitFunctionDefinitionNode(this);
 }
 
 void FunctionCallNode::accept(AstVisitor *p_visitor) {

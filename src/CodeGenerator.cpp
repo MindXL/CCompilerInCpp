@@ -26,7 +26,7 @@ std::string CodeGenerator::wrapFunctionName(std::string &name) {
 #endif
 }
 
-void CodeGenerator::visitFunctionNode(FunctionNode *p_node) {
+void CodeGenerator::visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) {
     using std::cout, std::endl;
 
     auto &&name{wrapFunctionName(p_node->name)};
