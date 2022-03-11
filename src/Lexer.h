@@ -25,7 +25,7 @@ namespace CCC {
         EQ, NE, GT, GE, LT, LE,
 
         IF, ELSE,
-        WHILE, DO,
+        WHILE, DO, FOR,
 
         Eof
     };

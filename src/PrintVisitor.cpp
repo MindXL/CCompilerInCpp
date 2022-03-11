@@ -56,6 +56,17 @@ void PrintVisitor::visitDoWhileStatementNode(DoWhileStatementNode *p_node) {
     content += ");";
 }
 
+void PrintVisitor::visitForStatementNode(ForStatementNode *p_node) {
+    content += "for(";
+    if (p_node->expr1) p_node->expr1->accept(this);
+    content += ';';
+    if (p_node->expr2) p_node->expr2->accept(this);
+    content += ';';
+    if (p_node->expr3) p_node->expr3->accept(this);
+    content += ')';
+    p_node->then_stmt->accept(this);
+}
+
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
     content += '=';

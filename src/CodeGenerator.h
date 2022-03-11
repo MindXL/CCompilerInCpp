@@ -27,6 +27,8 @@ namespace CCC {
 
         void visitDoWhileStatementNode(DoWhileStatementNode *p_node) override;
 
+        void visitForStatementNode(ForStatementNode *p_node) override;
+
         void visitAssignmentNode(AssignmentNode *p_node) override;
 
         void visitBinaryNode(BinaryNode *p_node) override;

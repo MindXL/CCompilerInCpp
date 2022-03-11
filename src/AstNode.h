@@ -76,6 +76,14 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
+    class ForStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> expr1, expr2, expr3;
+        std::shared_ptr<AstNode> then_stmt{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
     class AssignmentNode : public AstNode {
     public:
         std::shared_ptr<IdentifierNode> left;
@@ -140,6 +148,8 @@ namespace CCC {
         virtual void visitWhileStatementNode(WhileStatementNode *p_node) = 0;
 
         virtual void visitDoWhileStatementNode(DoWhileStatementNode *p_node) = 0;
+
+        virtual void visitForStatementNode(ForStatementNode *p_node) = 0;
 
         virtual void visitAssignmentNode(AssignmentNode *p_node) = 0;
 

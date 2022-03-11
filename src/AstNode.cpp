@@ -30,6 +30,10 @@ void DoWhileStatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitDoWhileStatementNode(this);
 }
 
+void ForStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitForStatementNode(this);
+}
+
 void AssignmentNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitAssignmentNode(this);
 }

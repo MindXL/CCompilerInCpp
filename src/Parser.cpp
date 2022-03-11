@@ -54,6 +54,22 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             lexer.expectToken(TokenType::Semicolon);
             return p_node;
         }
+        case TokenType::FOR: {
+            auto p_node = std::make_shared<ForStatementNode>();
+            lexer.getNextToken();
+            lexer.expectToken(TokenType::LParenthesis);
+            if (p_token->type != TokenType::Semicolon)
+                p_node->expr1 = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
+            if (p_token->type != TokenType::Semicolon)
+                p_node->expr2 = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
+            if (p_token->type != TokenType::RParenthesis)
+                p_node->expr3 = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            p_node->then_stmt = parseStatementExpr();
+            return p_node;
+        }
         case TokenType::LBrace: {
             auto p_node = std::make_shared<BlockStatementNode>();
             lexer.getNextToken();

@@ -24,6 +24,7 @@ namespace CCC {
     public:
         explicit Parser(Lexer &lexer) : lexer{lexer} {}
 
+        // TODO: Maybe I can get rid of recursion.
         std::shared_ptr<ProgramNode> parse();
 
     private:

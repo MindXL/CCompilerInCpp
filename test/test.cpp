@@ -55,6 +55,13 @@ TEST_CASE("Lexer", "[Lexer]") {
         REQUIRE(testLexer("a=0;while(a<10){a=a+1;a;}a;") == "a=0;while(a<10){a=a+1;a;}a;");
     }
 
+    SECTION("For Statement") {
+        REQUIRE(testLexer("a=1;for(i=1;i<=10;i=i+1) a=a+1;") == "a=1;for(i=1;i<=10;i=i+1)a=a+1;");
+        REQUIRE(testLexer("a=1;i=1;for(;i<=10;i=i+1) a=a+1;") == "a=1;i=1;for(;i<=10;i=i+1)a=a+1;");
+//        REQUIRE(testLexer()==);    // expr2 not testable for now
+        REQUIRE(testLexer("a=1;i=1;for(;i<=10;) {a=a+1;i=i+1;}") == "a=1;i=1;for(;i<=10;){a=a+1;i=i+1;}");
+    }
+
     SECTION("Do While Statament") {
         REQUIRE(testLexer("a=0;do a=a+1;while(a<10);") == "a=0;doa=a+1;while(a<10);");
         REQUIRE(testLexer("a=0;do {a=a+1; a=a+2;}while(a<10);") == "a=0;do{a=a+1;a=a+2;}while(a<10);");
@@ -138,6 +145,13 @@ TEST_CASE("Parser", "[Parser]") {
     SECTION("Do While Statament") {
         REQUIRE(testParser("a=0;do a=a+1;while(a<10);") == "a=0;do a=a+1;while(a<10);");
         REQUIRE(testParser("a=0;do {a=a+1; a=a+2;}while(a<10);") == "a=0;do {a=a+1;a=a+2;}while(a<10);");
+    }
+
+    SECTION("For Statement") {
+        REQUIRE(testParser("a=1;for(i=1;i<=10;i=i+1) a=a+1;") == "a=1;for(i=1;i<=10;i=i+1)a=a+1;");
+        REQUIRE(testParser("a=1;i=1;for(;i<=10;i=i+1) a=a+1;") == "a=1;i=1;for(;i<=10;i=i+1)a=a+1;");
+//        REQUIRE(testLexer()==);    // expr2 not testable for now
+        REQUIRE(testParser("a=1;i=1;for(;i<=10;) {a=a+1;i=i+1;}") == "a=1;i=1;for(;i<=10;){a=a+1;i=i+1;}");
     }
 
     SECTION("Braces") {
