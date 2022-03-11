@@ -43,14 +43,14 @@ std::shared_ptr<AstNode> Parser::parseFunction() {
 
     lexer.expectToken(TokenType::LBrace);
     while (lexer.p_token->type != TokenType::RBrace) {
-        p_node->statements.emplace_back(parseStatementExpr());
+        p_node->statements.emplace_back(parseStatement());
     }
     lexer.expectToken(TokenType::RBrace);
 
     return p_node;
 }
 
-std::shared_ptr<AstNode> Parser::parseStatementExpr() {
+std::shared_ptr<AstNode> Parser::parseStatement() {
     auto &p_token = lexer.p_token;
     switch (p_token->type) {
         case TokenType::IF: {
@@ -59,10 +59,10 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             lexer.expectToken(TokenType::LParenthesis);
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
             if (p_token->type == TokenType::ELSE) {
                 lexer.getNextToken();
-                p_node->else_stmt = parseStatementExpr();
+                p_node->else_stmt = parseStatement();
             }
             return p_node;
         }
@@ -72,13 +72,13 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             lexer.expectToken(TokenType::LParenthesis);
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
             return p_node;
         }
         case TokenType::DO: {
             auto p_node = std::make_shared<DoWhileStatementNode>();
             lexer.getNextToken();
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
             lexer.expectToken(TokenType::WHILE);
             lexer.expectToken(TokenType::LParenthesis);
             p_node->condition_expr = parseExpr();
@@ -99,14 +99,14 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             if (p_token->type != TokenType::RParenthesis)
                 p_node->expr3 = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
             return p_node;
         }
         case TokenType::LBrace: {
             auto p_node = std::make_shared<BlockStatementNode>();
             lexer.getNextToken();
             while (p_token->type != TokenType::RBrace) {
-                p_node->statements.emplace_back(parseStatementExpr());
+                p_node->statements.emplace_back(parseStatement());
             }
             lexer.expectToken(TokenType::RBrace);
             return p_node;
