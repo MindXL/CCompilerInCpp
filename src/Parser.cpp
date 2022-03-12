@@ -4,35 +4,75 @@
 
 #include "Parser.h"
 
-#include <iostream>
-#include <cassert>
-
 using namespace CCC;
 
 std::shared_ptr<ProgramNode> Parser::parse() {
     auto p_node = std::make_shared<ProgramNode>();
-    p_locals = &p_node->locals;    // 绑定变量列表
     while (lexer.p_token->type != TokenType::Eof) {
-        p_node->statements.emplace_back(parseStatementExpr());
+        p_node->functions.emplace_back(parseFunctionDefinition());
     }
     return p_node;
 }
 
-std::shared_ptr<AstNode> Parser::parseStatementExpr() {
+std::shared_ptr<AstNode> Parser::parseFunctionDefinition() {
+    auto p_node = std::make_shared<FunctionDefinitionNode>();
+    p_locals = &p_node->locals;    // 绑定变量列表
+    local_map.clear();
+
+    p_node->name = lexer.p_token->content;
+    lexer.expectToken(TokenType::Identifier);
+    lexer.expectToken(TokenType::LParenthesis);
+    if (lexer.p_token->type != TokenType::RParenthesis) {
+        // have parameters
+        do {
+            auto p_token = lexer.p_token;
+            auto line = lexer.line;
+            parsePrimaryExpr();
+            auto p_identifier = findLocal(p_token->content);
+            if (!p_identifier) {
+                diagnose(line, p_token->location.n_line, p_token->location.start_pos, p_token->content.length(),
+                         p_token->content, " is not a valid declaration of a parameter.");
+            }
+            p_node->parameters.emplace_back(p_identifier);
+        } while (lexer.p_token->type == TokenType::Comma && lexer.expectToken(TokenType::Comma));
+    }
+    lexer.expectToken(TokenType::RParenthesis);
+
+    lexer.expectToken(TokenType::LBrace);
+    while (lexer.p_token->type != TokenType::RBrace) {
+        p_node->statements.emplace_back(parseStatement());
+    }
+    lexer.expectToken(TokenType::RBrace);
+
+    return p_node;
+}
+
+std::shared_ptr<AstNode> Parser::parseFunctionCall(std::shared_ptr<Token> &p_nameToken) {
+    auto p_node = std::make_shared<FunctionCallNode>(p_nameToken->content);
+    lexer.expectToken(TokenType::LParenthesis);
+    if (lexer.p_token->type != TokenType::RParenthesis) {
+        // have arguments
+        do {
+            p_node->arguments.emplace_back(parseAssignmentExpr());
+        } while (lexer.p_token->type == TokenType::Comma && lexer.expectToken(TokenType::Comma));
+    }
+    lexer.expectToken(TokenType::RParenthesis);
+    return p_node;
+}
+
+std::shared_ptr<AstNode> Parser::parseStatement() {
     auto &p_token = lexer.p_token;
     switch (p_token->type) {
         case TokenType::IF: {
             auto p_node = std::make_shared<IfStatementNode>();
             lexer.getNextToken();
             lexer.expectToken(TokenType::LParenthesis);
-            lexer.getNextToken();
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
-            lexer.getNextToken();
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
             if (p_token->type == TokenType::ELSE) {
                 lexer.getNextToken();
-                p_node->else_stmt = parseStatementExpr();
+                p_node->else_stmt = parseStatement();
             }
             return p_node;
         }
@@ -40,21 +80,52 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
             auto p_node = std::make_shared<WhileStatementNode>();
             lexer.getNextToken();
             lexer.expectToken(TokenType::LParenthesis);
-            lexer.getNextToken();
             p_node->condition_expr = parseExpr();
             lexer.expectToken(TokenType::RParenthesis);
+            p_node->then_stmt = parseStatement();
+            return p_node;
+        }
+        case TokenType::DO: {
+            auto p_node = std::make_shared<DoWhileStatementNode>();
             lexer.getNextToken();
-            p_node->then_stmt = parseStatementExpr();
+            p_node->then_stmt = parseStatement();
+            lexer.expectToken(TokenType::WHILE);
+            lexer.expectToken(TokenType::LParenthesis);
+            p_node->condition_expr = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            lexer.expectToken(TokenType::Semicolon);
+            return p_node;
+        }
+        case TokenType::FOR: {
+            auto p_node = std::make_shared<ForStatementNode>();
+            lexer.getNextToken();
+            lexer.expectToken(TokenType::LParenthesis);
+            if (p_token->type != TokenType::Semicolon)
+                p_node->expr1 = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
+            if (p_token->type != TokenType::Semicolon)
+                p_node->expr2 = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
+            if (p_token->type != TokenType::RParenthesis)
+                p_node->expr3 = parseExpr();
+            lexer.expectToken(TokenType::RParenthesis);
+            p_node->then_stmt = parseStatement();
+            return p_node;
+        }
+        case TokenType::RETURN: {
+            auto p_node = std::make_shared<ReturnStatementNode>();
+            lexer.getNextToken();
+            p_node->left = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
             return p_node;
         }
         case TokenType::LBrace: {
             auto p_node = std::make_shared<BlockStatementNode>();
             lexer.getNextToken();
             while (p_token->type != TokenType::RBrace) {
-                p_node->statements.emplace_back(parseStatementExpr());
+                p_node->statements.emplace_back(parseStatement());
             }
             lexer.expectToken(TokenType::RBrace);
-            lexer.getNextToken();
             return p_node;
         }
         default: {
@@ -62,17 +133,16 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
                     p_token->type != TokenType::Semicolon ? parseExpr() : nullptr
             );
             lexer.expectToken(TokenType::Semicolon);
-            lexer.getNextToken();
             return p_node;
         }
     }
 }
 
-std::shared_ptr<AstNode> Parser::parseExpr() {
+std::shared_ptr<PWAstNode> Parser::parseExpr() {
     return parseAssignmentExpr();
 }
 
-std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
+std::shared_ptr<PWAstNode> Parser::parseAssignmentExpr() {
     auto left = parseEqualityExpr();
     if (lexer.p_token->type == TokenType::Assignment) {
         lexer.getNextToken();
@@ -85,7 +155,7 @@ std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
     }
 }
 
-std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
+std::shared_ptr<PWAstNode> Parser::parseEqualityExpr() {
     auto left = parseRelationalExpr();
     auto &p_token = lexer.p_token;
     while (p_token->type == TokenType::EQ || p_token->type == TokenType::NE) {
@@ -97,7 +167,7 @@ std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
+std::shared_ptr<PWAstNode> Parser::parseRelationalExpr() {
     auto left = parseAddExpr();
     auto &p_token = lexer.p_token;
     while (p_token->type == TokenType::GT || p_token->type == TokenType::GE || p_token->type == TokenType::LT ||
@@ -126,7 +196,7 @@ std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseAddExpr() {
+std::shared_ptr<PWAstNode> Parser::parseAddExpr() {
     auto left = parseMulExpr();
 
     auto &p_token = lexer.p_token;
@@ -144,7 +214,7 @@ std::shared_ptr<AstNode> Parser::parseAddExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseMulExpr() {
+std::shared_ptr<PWAstNode> Parser::parseMulExpr() {
     auto left = parsePrimaryExpr();
 
     auto &p_token = lexer.p_token;
@@ -159,21 +229,30 @@ std::shared_ptr<AstNode> Parser::parseMulExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
-    std::shared_ptr<AstNode> p_node{nullptr};
+std::shared_ptr<PWAstNode> Parser::parsePrimaryExpr() {
+    std::shared_ptr<PWAstNode> p_node{nullptr};
     switch (lexer.p_token->type) {
         case TokenType::LParenthesis: {
             lexer.getNextToken();
             p_node = parseExpr();
+            p_node->wrapped = true;
             lexer.expectToken(TokenType::RParenthesis);
             break;
         }
         case TokenType::Num: {
             p_node = std::make_shared<ConstantNode>(lexer.p_token->value);
+            lexer.getNextToken();
             break;
         }
         case TokenType::Identifier: {
-            auto name = lexer.p_token->content;
+            auto p_lastToken = lexer.p_token;
+            lexer.getNextToken();
+            if (lexer.p_token->type == TokenType::LParenthesis) {
+                // func call
+                return parseFunctionCall(p_lastToken);
+            }
+
+            auto name = p_lastToken->content;
             auto identifier = findLocal(name);
             p_node = std::make_shared<IdentifierNode>(identifier ? identifier : registerLocal(name));
             break;
@@ -189,7 +268,6 @@ std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
                      "grammar around this token '", p_token->content, "' is not supported.");
         }
     }
-    lexer.getNextToken();
     return p_node;
 }
 

@@ -16,6 +16,10 @@ namespace CCC {
         void visitProgramNode(ProgramNode *p_node) override;
 
     private:
+        void visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) override;
+
+        void visitFunctionCallNode(FunctionCallNode *p_node) override;
+
         void visitStatementNode(StatementNode *p_node) override;
 
         void visitBlockStatementNode(BlockStatementNode *p_node) override;
@@ -23,6 +27,12 @@ namespace CCC {
         void visitIfStatementNode(IfStatementNode *p_node) override;
 
         void visitWhileStatementNode(WhileStatementNode *p_node) override;
+
+        void visitDoWhileStatementNode(DoWhileStatementNode *p_node) override;
+
+        void visitForStatementNode(ForStatementNode *p_node) override;
+
+        void visitReturnStatementNode(ReturnStatementNode *p_node) override;
 
         void visitAssignmentNode(AssignmentNode *p_node) override;
 

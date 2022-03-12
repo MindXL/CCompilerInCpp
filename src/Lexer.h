@@ -9,6 +9,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <sstream>
+#include <cassert>
 
 #include "diagnose.h"
 
@@ -20,12 +22,13 @@ namespace CCC {
         LParenthesis, RParenthesis,
         LBrace, RBrace,
         Identifier,
-        Semicolon,
+        Semicolon, Comma,
         Assignment,
         EQ, NE, GT, GE, LT, LE,
 
         IF, ELSE,
-        WHILE,
+        WHILE, DO, FOR,
+        RETURN,
 
         Eof
     };
@@ -60,6 +63,9 @@ namespace CCC {
         std::string line;
         size_t n_line{0};    // count from 1
 
+        std::shared_ptr<Token> p_lastToken;
+        std::string last_line;
+
     private:
         std::string::const_iterator cit{line.cbegin()};
 
@@ -72,7 +78,7 @@ namespace CCC {
 
         void getNextToken();
 
-        void expectToken(TokenType type);
+        bool expectToken(TokenType type);
 
     private:
         void next();
