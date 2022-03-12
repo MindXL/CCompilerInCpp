@@ -10,6 +10,14 @@ void ProgramNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitProgramNode(this);
 }
 
+void FunctionDefinitionNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitFunctionDefinitionNode(this);
+}
+
+void FunctionCallNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitFunctionCallNode(this);
+}
+
 void StatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitStatementNode(this);
 }
@@ -24,6 +32,18 @@ void IfStatementNode::accept(AstVisitor *p_visitor) {
 
 void WhileStatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitWhileStatementNode(this);
+}
+
+void DoWhileStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitDoWhileStatementNode(this);
+}
+
+void ForStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitForStatementNode(this);
+}
+
+void ReturnStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitReturnStatementNode(this);
 }
 
 void AssignmentNode::accept(AstVisitor *p_visitor) {

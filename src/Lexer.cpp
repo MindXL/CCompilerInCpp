@@ -4,9 +4,6 @@
 
 #include "Lexer.h"
 
-#include <sstream>
-#include <cassert>
-
 using namespace CCC;
 
 Lexer::Lexer(const char *filename) : ifs{filename, std::ios::in} {
@@ -78,6 +75,10 @@ void Lexer::getNextToken() {
         next();
         type = TokenType::Semicolon;
         content = ';';
+    } else if (*cit == ',') {
+        next();
+        type = TokenType::Comma;
+        content = ',';
     } else if (*cit == '=') {
         next();
         if (*cit == '=') {
@@ -140,6 +141,12 @@ void Lexer::getNextToken() {
             type = TokenType::ELSE;
         } else if (content == "while") {
             type = TokenType::WHILE;
+        } else if (content == "do") {
+            type = TokenType::DO;
+        } else if (content == "for") {
+            type = TokenType::FOR;
+        } else if (content == "return") {
+            type = TokenType::RETURN;
         } else {
             type = TokenType::Identifier;
         }
@@ -151,9 +158,8 @@ void Lexer::getNextToken() {
     p_token = std::make_shared<Token>(type, value, content, location);
 }
 
-void Lexer::expectToken(TokenType type) {
-    // This function won't pass the current token.
-    // After 'expectToken', 'getNextToken' is needed provided to pass the current token.
+bool Lexer::expectToken(TokenType type) {
+    // This function will pass the current token.
     if (p_token->type != type) {
         char expected{'\0'};
         switch (type) {
@@ -176,6 +182,8 @@ void Lexer::expectToken(TokenType type) {
         diagnose(line, location.n_line, location.start_pos, p_token->content.length(),
                  "expected '", expected, '\'');
     }
+    getNextToken();
+    return true;
 }
 
 void Lexer::next() {

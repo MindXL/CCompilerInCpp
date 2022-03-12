@@ -4,34 +4,41 @@
 
 #include "CodeGenerator.h"
 
-#include <iostream>
-#include <cassert>
-
 using namespace CCC;
 
 void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
-    using std::cout, std::endl;
-    cout << "\t.text" << endl;
+    for (const auto &f:p_node->functions) {
+        f->accept(this);
+    }
+}
 
-    /* 函数开始 */
+std::string CodeGenerator::wrapFunctionName(std::string &name) {
 #ifdef __linux__
     /// Linux
-    cout << "\t.globl prog" << endl
-         << "prog:" << endl;
+    return name;
 #else
     /// MacOS
-    cout << "\t.globl _prog" << endl
-              << "_prog:" << endl;
+    return '_' + name;
 #endif
+}
+
+void CodeGenerator::visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) {
+    using std::cout, std::endl;
+
+    func_name = wrapFunctionName(p_node->name);
+    cout << "\t.text" << endl;
+    /* 函数开始 */
+    cout << "\t.globl " << func_name << endl
+         << func_name << ':' << endl;
 
     int stack_size = 0;
     for (const auto &local:p_node->locals) {
         stack_size += 8;
         local->offset = stack_size * -1;
     }
+    stack_size = align(stack_size, 16);
 
     /* rbp 栈基指针, rsp 栈顶指针 */
-
     // 修改rsp的地址指向rbp
     cout << "\tpush %rbp" << endl
          << "\tmov %rsp, %rbp" << endl;
@@ -39,15 +46,36 @@ void CodeGenerator::visitProgramNode(ProgramNode *p_node) {
     // 开辟32字节的栈空间
     cout << "\tsub $" << stack_size << ", %rsp" << endl;
 
-    for (const auto &statement:p_node->statements) {
-        statement->accept(this);
+    /* parameters */
+    for (int i = 0; i < p_node->parameters.size(); i++) {
+        cout << "\tmov " << registers[i] << ", " << p_node->parameters.at(i)->offset << "(%rbp)" << endl;
+    }
+
+    for (const auto &s:p_node->statements) {
+        s->accept(this);
         assert(stack_level == 0);
     }
 
     /* 函数结束 */
-    cout << "\tmov %rbp, %rsp" << endl
+    cout << ".L." << func_name << ".Return:" << endl
+         << "\tmov %rbp, %rsp" << endl
          << "\tpop %rbp" << endl
          << "\tret" << endl;
+}
+
+void CodeGenerator::visitFunctionCallNode(FunctionCallNode *p_node) {
+    auto &&name{wrapFunctionName(p_node->name)};
+
+    // pass arguments through the registers
+    for (const auto &arg:p_node->arguments) {
+        arg->accept(this);
+        pushRAX();
+    }
+    // TODO: is this extravagant?
+    for (auto i = p_node->arguments.size() - 1; i != decltype(p_node->arguments.size())(0 - 1); i--) {
+        popTo(registers[i]);
+    }
+    std::cout << "\tcall " << name << std::endl;
 }
 
 void CodeGenerator::visitStatementNode(StatementNode *p_node) {
@@ -96,6 +124,43 @@ void CodeGenerator::visitWhileStatementNode(WhileStatementNode *p_node) {
     p_node->then_stmt->accept(this);
     cout << "\tjmp .L" << n << ".begin" << endl
          << ".L" << n << ".end:" << endl;
+}
+
+void CodeGenerator::visitDoWhileStatementNode(DoWhileStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    cout << ".L" << n << ".begin:" << endl;
+    p_node->then_stmt->accept(this);
+    p_node->condition_expr->accept(this);
+    cout << "\tcmp $0, %rax" << endl
+         << "\tjne .L" << n << ".begin" << endl;
+}
+
+void CodeGenerator::visitForStatementNode(ForStatementNode *p_node) {
+    using std::cout, std::endl;
+
+    const int n = n_mnemonic++;
+
+    if (p_node->expr1)
+        p_node->expr1->accept(this);
+    cout << ".L" << n << ".begin:" << endl;
+    if (p_node->expr2) {
+        p_node->expr2->accept(this);
+        cout << "\tcmp $0, %rax" << endl
+             << "\tje .L" << n << ".end" << endl;
+    }
+    p_node->then_stmt->accept(this);
+    if (p_node->expr3)
+        p_node->expr3->accept(this);
+    cout << "\tjmp .L" << n << ".begin" << endl
+         << ".L" << n << ".end:" << endl;
+}
+
+void CodeGenerator::visitReturnStatementNode(ReturnStatementNode *p_node) {
+    p_node->left->accept(this);
+    std::cout << "\tjmp .L." << func_name << ".Return" << std::endl;
 }
 
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {
@@ -188,4 +253,8 @@ void CodeGenerator::visitIdentifierNode(IdentifierNode *p_node) {
     /// x86
     cout << "\tlea " << p_node->local->offset << "(%rbp), %rax" << endl    // 取变量地址至rax
          << "\tmov (%rax), %rax" << endl;    // 间接寻址
+}
+
+constexpr int CodeGenerator::align(int size, int align) {
+    return (size + align - 1) / align * align;
 }

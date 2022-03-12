@@ -1,11 +1,12 @@
 #include <iostream>
-#include <fstream>
 
 #include "Lexer.h"
 #include "Parser.h"
 #include "CodeGenerator.h"
 
 using namespace CCC;
+
+// TODO: check whether every shared_ptr.use_count is 1 after parsed.
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {

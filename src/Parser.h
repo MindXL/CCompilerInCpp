@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <iostream>
+#include <cassert>
 
 #include "Lexer.h"
 #include "AstNode.h"
@@ -24,10 +26,15 @@ namespace CCC {
     public:
         explicit Parser(Lexer &lexer) : lexer{lexer} {}
 
+        // TODO: Maybe I can get rid of recursion.
         std::shared_ptr<ProgramNode> parse();
 
     private:
-        std::shared_ptr<AstNode> parseStatementExpr();
+        std::shared_ptr<AstNode> parseFunctionDefinition();
+
+        std::shared_ptr<AstNode> parseFunctionCall(std::shared_ptr<Token> &p_nameToken);
+
+        std::shared_ptr<AstNode> parseStatement();
 
         std::shared_ptr<PWAstNode> parseExpr();
 

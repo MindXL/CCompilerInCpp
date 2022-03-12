@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <list>
+#include <vector>
 
 namespace CCC {
     class IdentifierNode;
@@ -34,10 +35,31 @@ namespace CCC {
         explicit Identifier(std::string &name) : name{name} {}
     };
 
+    // TODO: management between function and its namesake
     class ProgramNode : public AstNode {
     public:
-        std::list<std::shared_ptr<AstNode>> statements;
+        std::list<std::shared_ptr<AstNode>> functions;
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    // TODO: management between parameters and namesake locals
+    class FunctionDefinitionNode : public AstNode {
+    public:
+        std::string name;
+        std::vector<std::shared_ptr<Identifier>> parameters;
         std::list<std::shared_ptr<Identifier>> locals;
+        std::list<std::shared_ptr<AstNode>> statements;
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class FunctionCallNode : public AstNode {
+    public:
+        std::string name;
+        std::vector<std::shared_ptr<AstNode>> arguments;
+
+        explicit FunctionCallNode(std::string &name) : name{name} {}
 
         void accept(AstVisitor *p_visitor) override;
     };
@@ -71,6 +93,29 @@ namespace CCC {
     public:
         std::shared_ptr<PWAstNode> condition_expr{nullptr};
         std::shared_ptr<AstNode> then_stmt{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class DoWhileStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> then_stmt{nullptr};
+        std::shared_ptr<AstNode> condition_expr{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class ForStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> expr1, expr2, expr3;
+        std::shared_ptr<AstNode> then_stmt{nullptr};
+
+        void accept(AstVisitor *p_visitor) override;
+    };
+
+    class ReturnStatementNode : public AstNode {
+    public:
+        std::shared_ptr<AstNode> left;
 
         void accept(AstVisitor *p_visitor) override;
     };
@@ -130,6 +175,10 @@ namespace CCC {
     public:
         virtual void visitProgramNode(ProgramNode *p_node) = 0;
 
+        virtual void visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) = 0;
+
+        virtual void visitFunctionCallNode(FunctionCallNode *p_node) = 0;
+
         virtual void visitStatementNode(StatementNode *p_node) = 0;
 
         virtual void visitBlockStatementNode(BlockStatementNode *p_node) = 0;
@@ -137,6 +186,12 @@ namespace CCC {
         virtual void visitIfStatementNode(IfStatementNode *p_node) = 0;
 
         virtual void visitWhileStatementNode(WhileStatementNode *p_node) = 0;
+
+        virtual void visitDoWhileStatementNode(DoWhileStatementNode *p_node) = 0;
+
+        virtual void visitForStatementNode(ForStatementNode *p_node) = 0;
+
+        virtual void visitReturnStatementNode(ReturnStatementNode *p_node) = 0;
 
         virtual void visitAssignmentNode(AssignmentNode *p_node) = 0;
 
