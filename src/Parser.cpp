@@ -47,7 +47,7 @@ std::shared_ptr<AstNode> Parser::parseFunctionDefinition() {
     return p_node;
 }
 
-std::shared_ptr<AstNode> Parser::parseFunctionCall(std::shared_ptr<Token> &p_nameToken) {
+std::shared_ptr<PWAstNode> Parser::parseFunctionCall(std::shared_ptr<Token> &p_nameToken) {
     auto p_node = std::make_shared<FunctionCallNode>(p_nameToken->content);
     lexer.expectToken(TokenType::LParenthesis);
     if (lexer.p_token->type != TokenType::RParenthesis) {

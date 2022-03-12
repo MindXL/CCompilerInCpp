@@ -54,7 +54,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class FunctionCallNode : public AstNode {
+    class FunctionCallNode : public PWAstNode {
     public:
         std::string name;
         std::vector<std::shared_ptr<AstNode>> arguments;
