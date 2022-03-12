@@ -68,11 +68,11 @@ std::shared_ptr<AstNode> Parser::parseStatementExpr() {
     }
 }
 
-std::shared_ptr<AstNode> Parser::parseExpr() {
+std::shared_ptr<PWAstNode> Parser::parseExpr() {
     return parseAssignmentExpr();
 }
 
-std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
+std::shared_ptr<PWAstNode> Parser::parseAssignmentExpr() {
     auto left = parseEqualityExpr();
     if (lexer.p_token->type == TokenType::Assignment) {
         lexer.getNextToken();
@@ -85,7 +85,7 @@ std::shared_ptr<AstNode> Parser::parseAssignmentExpr() {
     }
 }
 
-std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
+std::shared_ptr<PWAstNode> Parser::parseEqualityExpr() {
     auto left = parseRelationalExpr();
     auto &p_token = lexer.p_token;
     while (p_token->type == TokenType::EQ || p_token->type == TokenType::NE) {
@@ -97,7 +97,7 @@ std::shared_ptr<AstNode> Parser::parseEqualityExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
+std::shared_ptr<PWAstNode> Parser::parseRelationalExpr() {
     auto left = parseAddExpr();
     auto &p_token = lexer.p_token;
     while (p_token->type == TokenType::GT || p_token->type == TokenType::GE || p_token->type == TokenType::LT ||
@@ -126,7 +126,7 @@ std::shared_ptr<AstNode> Parser::parseRelationalExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseAddExpr() {
+std::shared_ptr<PWAstNode> Parser::parseAddExpr() {
     auto left = parseMulExpr();
 
     auto &p_token = lexer.p_token;
@@ -144,7 +144,7 @@ std::shared_ptr<AstNode> Parser::parseAddExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parseMulExpr() {
+std::shared_ptr<PWAstNode> Parser::parseMulExpr() {
     auto left = parsePrimaryExpr();
 
     auto &p_token = lexer.p_token;
@@ -159,13 +159,13 @@ std::shared_ptr<AstNode> Parser::parseMulExpr() {
     return left;
 }
 
-std::shared_ptr<AstNode> Parser::parsePrimaryExpr() {
-    std::shared_ptr<AstNode> p_node{nullptr};
+std::shared_ptr<PWAstNode> Parser::parsePrimaryExpr() {
+    std::shared_ptr<PWAstNode> p_node{nullptr};
     switch (lexer.p_token->type) {
         case TokenType::LParenthesis: {
             lexer.getNextToken();
             p_node = parseExpr();
-            std::dynamic_pointer_cast<PWAstNode>(p_node)->wrapped = true;
+            p_node->wrapped = true;
             lexer.expectToken(TokenType::RParenthesis);
             break;
         }

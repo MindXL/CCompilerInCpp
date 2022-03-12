@@ -29,19 +29,19 @@ namespace CCC {
     private:
         std::shared_ptr<AstNode> parseStatementExpr();
 
-        std::shared_ptr<AstNode> parseExpr();
+        std::shared_ptr<PWAstNode> parseExpr();
 
-        std::shared_ptr<AstNode> parseAssignmentExpr();
+        std::shared_ptr<PWAstNode> parseAssignmentExpr();
 
-        std::shared_ptr<AstNode> parseEqualityExpr();
+        std::shared_ptr<PWAstNode> parseEqualityExpr();
 
-        std::shared_ptr<AstNode> parseRelationalExpr();
+        std::shared_ptr<PWAstNode> parseRelationalExpr();
 
-        std::shared_ptr<AstNode> parseAddExpr();
+        std::shared_ptr<PWAstNode> parseAddExpr();
 
-        std::shared_ptr<AstNode> parseMulExpr();
+        std::shared_ptr<PWAstNode> parseMulExpr();
 
-        std::shared_ptr<AstNode> parsePrimaryExpr();
+        std::shared_ptr<PWAstNode> parsePrimaryExpr();
 
         std::shared_ptr<Identifier> findLocal(std::string &name);
 

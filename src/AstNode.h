@@ -60,7 +60,7 @@ namespace CCC {
 
     class IfStatementNode : public AstNode {
     public:
-        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<PWAstNode> condition_expr{nullptr};
         std::shared_ptr<AstNode> then_stmt{nullptr};
         std::shared_ptr<AstNode> else_stmt{nullptr};
 
@@ -69,7 +69,7 @@ namespace CCC {
 
     class WhileStatementNode : public AstNode {
     public:
-        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<PWAstNode> condition_expr{nullptr};
         std::shared_ptr<AstNode> then_stmt{nullptr};
 
         void accept(AstVisitor *p_visitor) override;
@@ -78,11 +78,11 @@ namespace CCC {
     class AssignmentNode : public PWAstNode {
     public:
         std::shared_ptr<IdentifierNode> left;
-        std::shared_ptr<AstNode> right;
+        std::shared_ptr<PWAstNode> right;
 
         AssignmentNode(
                 std::shared_ptr<IdentifierNode> &&left,
-                std::shared_ptr<AstNode> &&right
+                std::shared_ptr<PWAstNode> &&right
         ) : left{left}, right{right} {}
 
         void accept(AstVisitor *p_visitor) override;
@@ -96,13 +96,13 @@ namespace CCC {
     class BinaryNode : public PWAstNode {
     public:
         BinaryOperator op;
-        std::shared_ptr<AstNode> left;
-        std::shared_ptr<AstNode> right;
+        std::shared_ptr<PWAstNode> left;
+        std::shared_ptr<PWAstNode> right;
 
         BinaryNode(
                 BinaryOperator op,
-                std::shared_ptr<AstNode> &&left,
-                std::shared_ptr<AstNode> &&right
+                std::shared_ptr<PWAstNode> &&left,
+                std::shared_ptr<PWAstNode> &&right
         ) : op{op}, left{left}, right{right} {}
 
         void accept(AstVisitor *p_visitor) override;
