@@ -145,6 +145,8 @@ void Lexer::getNextToken() {
             type = TokenType::DO;
         } else if (content == "for") {
             type = TokenType::FOR;
+        } else if (content == "return") {
+            type = TokenType::RETURN;
         } else {
             type = TokenType::Identifier;
         }

@@ -92,6 +92,12 @@ void PrintVisitor::visitForStatementNode(ForStatementNode *p_node) {
     p_node->then_stmt->accept(this);
 }
 
+void PrintVisitor::visitReturnStatementNode(ReturnStatementNode *p_node) {
+    content += "return ";
+    p_node->left->accept(this);
+    content += ';';
+}
+
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
     p_node->left->accept(this);
     content += '=';

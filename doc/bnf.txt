@@ -11,6 +11,7 @@ Statement      := Expr?;
                := do Statement while\(Expr\);
                := for \(Expr?;Expr?;Expr?\) Statement
                := {Statement*}
+               := return Expr;
 
 Expr           := AssignmentExpr
 

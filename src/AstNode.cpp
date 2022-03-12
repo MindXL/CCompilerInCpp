@@ -42,6 +42,10 @@ void ForStatementNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitForStatementNode(this);
 }
 
+void ReturnStatementNode::accept(AstVisitor *p_visitor) {
+    p_visitor->visitReturnStatementNode(this);
+}
+
 void AssignmentNode::accept(AstVisitor *p_visitor) {
     p_visitor->visitAssignmentNode(this);
 }

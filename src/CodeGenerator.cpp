@@ -25,11 +25,11 @@ std::string CodeGenerator::wrapFunctionName(std::string &name) {
 void CodeGenerator::visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) {
     using std::cout, std::endl;
 
-    auto &&name{wrapFunctionName(p_node->name)};
+    func_name = wrapFunctionName(p_node->name);
     cout << "\t.text" << endl;
     /* 函数开始 */
-    cout << "\t.globl " << name << endl
-         << name << ':' << endl;
+    cout << "\t.globl " << func_name << endl
+         << func_name << ':' << endl;
 
     int stack_size = 0;
     for (const auto &local:p_node->locals) {
@@ -57,7 +57,8 @@ void CodeGenerator::visitFunctionDefinitionNode(FunctionDefinitionNode *p_node) 
     }
 
     /* 函数结束 */
-    cout << "\tmov %rbp, %rsp" << endl
+    cout << ".L." << func_name << ".Return:" << endl
+         << "\tmov %rbp, %rsp" << endl
          << "\tpop %rbp" << endl
          << "\tret" << endl;
 }
@@ -155,6 +156,11 @@ void CodeGenerator::visitForStatementNode(ForStatementNode *p_node) {
         p_node->expr3->accept(this);
     cout << "\tjmp .L" << n << ".begin" << endl
          << ".L" << n << ".end:" << endl;
+}
+
+void CodeGenerator::visitReturnStatementNode(ReturnStatementNode *p_node) {
+    p_node->left->accept(this);
+    std::cout << "\tjmp .L." << func_name << ".Return" << std::endl;
 }
 
 void CodeGenerator::visitAssignmentNode(AssignmentNode *p_node) {

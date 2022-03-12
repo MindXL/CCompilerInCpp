@@ -32,6 +32,8 @@ namespace CCC {
 
         void visitForStatementNode(ForStatementNode *p_node) override;
 
+        void visitReturnStatementNode(ReturnStatementNode *p_node) override;
+
         void visitAssignmentNode(AssignmentNode *p_node) override;
 
         void visitBinaryNode(BinaryNode *p_node) override;

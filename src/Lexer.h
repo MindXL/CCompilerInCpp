@@ -28,6 +28,7 @@ namespace CCC {
 
         IF, ELSE,
         WHILE, DO, FOR,
+        RETURN,
 
         Eof
     };

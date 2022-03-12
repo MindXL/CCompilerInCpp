@@ -18,6 +18,7 @@ namespace CCC {
         int n_mnemonic{0};
         /* x86寄存器 */
         static constexpr const char *registers[6] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+        std::string func_name;    // The function which is to be defined.
 
     public:
         void visitProgramNode(ProgramNode *p_node) override;
@@ -40,6 +41,9 @@ namespace CCC {
         void visitDoWhileStatementNode(DoWhileStatementNode *p_node) override;
 
         void visitForStatementNode(ForStatementNode *p_node) override;
+
+        void visitReturnStatementNode(ReturnStatementNode *p_node) override;
+
 
         void visitAssignmentNode(AssignmentNode *p_node) override;
 

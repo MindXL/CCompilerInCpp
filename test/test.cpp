@@ -94,6 +94,15 @@ TEST_CASE("Lexer", "[Lexer]") {
         //        REQUIRE(T("f(n) {n=n+1;} g(n) {n=n+2;} g(f(1));") == "f(n){n=n+1;}g(n){n=n+2;}g(f(1));");
     }
 
+    SECTION("Return Statement") {
+        REQUIRE(T("f(){return 1;}") == "f(){return1;}");
+        REQUIRE(T("f(n){return n;}") == "f(n){returnn;}");
+        REQUIRE(T("add(a,b,c,d,e,f){return a+b+c+d+e+f;}prog(){return add(1,2,3,4,5,6);}") ==
+                "add(a,b,c,d,e,f){returna+b+c+d+e+f;}prog(){returnadd(1,2,3,4,5,6);}");
+        REQUIRE(T("fib(n){if(n<=1){return 1;}return fib(n-1)+fib(n-2);}prog(){return fib(4);}") ==
+                "fib(n){if(n<=1){return1;}returnfib(n-1)+fib(n-2);}prog(){returnfib(4);}");
+    }
+
     filesystem::remove(testfile);
 }
 
@@ -201,6 +210,15 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(T("add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}") ==
                 "add(a,b,c,d,e,f){a+b+c+d+e+f;}prog(){add(1,2,3,4,5,6);}");
 //        REQUIRE(T("f(n) {n=n+1;} g(n) {n=n+2;} g(f(1));") == "f(n){n=n+1;}g(n){n=n+2;}g(f(1));");
+    }
+
+    SECTION("Return Statement") {
+        REQUIRE(T("f(){return 1;}") == "f(){return 1;}");
+        REQUIRE(T("f(n){return n;}") == "f(n){return n;}");
+        REQUIRE(T("add(a,b,c,d,e,f){return a+b+c+d+e+f;}prog(){return add(1,2,3,4,5,6);}") ==
+                "add(a,b,c,d,e,f){return a+b+c+d+e+f;}prog(){return add(1,2,3,4,5,6);}");
+        REQUIRE(T("fib(n){if(n<=1){return 1;}return fib(n-1)+fib(n-2);}prog(){return fib(4);}") ==
+                "fib(n){if(n<=1){return 1;}return fib(n-1)+fib(n-2);}prog(){return fib(4);}");
     }
 
     filesystem::remove(testfile);

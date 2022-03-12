@@ -112,6 +112,13 @@ std::shared_ptr<AstNode> Parser::parseStatement() {
             p_node->then_stmt = parseStatement();
             return p_node;
         }
+        case TokenType::RETURN: {
+            auto p_node = std::make_shared<ReturnStatementNode>();
+            lexer.getNextToken();
+            p_node->left = parseExpr();
+            lexer.expectToken(TokenType::Semicolon);
+            return p_node;
+        }
         case TokenType::LBrace: {
             auto p_node = std::make_shared<BlockStatementNode>();
             lexer.getNextToken();
