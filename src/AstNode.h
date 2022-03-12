@@ -20,6 +20,13 @@ namespace CCC {
         virtual void accept(AstVisitor *p_visitor) = 0;
     };
 
+    class ParenthesesWrappableAstNode : public AstNode {
+    public:
+        bool wrapped{false};
+    };
+
+    using PWAstNode = ParenthesesWrappableAstNode;
+
     class Identifier {
     public:
         std::string name;
@@ -75,7 +82,7 @@ namespace CCC {
 
     class IfStatementNode : public AstNode {
     public:
-        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<PWAstNode> condition_expr{nullptr};
         std::shared_ptr<AstNode> then_stmt{nullptr};
         std::shared_ptr<AstNode> else_stmt{nullptr};
 
@@ -84,7 +91,7 @@ namespace CCC {
 
     class WhileStatementNode : public AstNode {
     public:
-        std::shared_ptr<AstNode> condition_expr{nullptr};
+        std::shared_ptr<PWAstNode> condition_expr{nullptr};
         std::shared_ptr<AstNode> then_stmt{nullptr};
 
         void accept(AstVisitor *p_visitor) override;
@@ -113,14 +120,14 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class AssignmentNode : public AstNode {
+    class AssignmentNode : public PWAstNode {
     public:
         std::shared_ptr<IdentifierNode> left;
-        std::shared_ptr<AstNode> right;
+        std::shared_ptr<PWAstNode> right;
 
         AssignmentNode(
                 std::shared_ptr<IdentifierNode> &&left,
-                std::shared_ptr<AstNode> &&right
+                std::shared_ptr<PWAstNode> &&right
         ) : left{left}, right{right} {}
 
         void accept(AstVisitor *p_visitor) override;
@@ -131,22 +138,22 @@ namespace CCC {
         EQ, NE, GT, GE, LT, LE
     };
 
-    class BinaryNode : public AstNode {
+    class BinaryNode : public PWAstNode {
     public:
         BinaryOperator op;
-        std::shared_ptr<AstNode> left;
-        std::shared_ptr<AstNode> right;
+        std::shared_ptr<PWAstNode> left;
+        std::shared_ptr<PWAstNode> right;
 
         BinaryNode(
                 BinaryOperator op,
-                std::shared_ptr<AstNode> &&left,
-                std::shared_ptr<AstNode> &&right
+                std::shared_ptr<PWAstNode> &&left,
+                std::shared_ptr<PWAstNode> &&right
         ) : op{op}, left{left}, right{right} {}
 
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class ConstantNode : public AstNode {
+    class ConstantNode : public PWAstNode {
     public:
         int value;
 
@@ -155,7 +162,7 @@ namespace CCC {
         void accept(AstVisitor *p_visitor) override;
     };
 
-    class IdentifierNode : public AstNode {
+    class IdentifierNode : public PWAstNode {
     public:
         std::shared_ptr<Identifier> local;
 

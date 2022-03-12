@@ -99,12 +99,15 @@ void PrintVisitor::visitReturnStatementNode(ReturnStatementNode *p_node) {
 }
 
 void PrintVisitor::visitAssignmentNode(AssignmentNode *p_node) {
+    if (p_node->wrapped) content += '(';
     p_node->left->accept(this);
     content += '=';
     p_node->right->accept(this);
+    if (p_node->wrapped) content += ')';
 }
 
 void PrintVisitor::visitBinaryNode(BinaryNode *p_node) {
+    if (p_node->wrapped) content += '(';
     p_node->left->accept(this);
     switch (p_node->op) {
         case BinaryOperator::Add:
@@ -139,12 +142,17 @@ void PrintVisitor::visitBinaryNode(BinaryNode *p_node) {
             break;
     }
     p_node->right->accept(this);
+    if (p_node->wrapped) content += ')';
 }
 
 void PrintVisitor::visitConstantNode(ConstantNode *p_node) {
+    if (p_node->wrapped) content += '(';
     content += std::to_string(p_node->value);
+    if (p_node->wrapped) content += ')';
 }
 
 void PrintVisitor::visitIdentifierNode(IdentifierNode *p_node) {
+    if (p_node->wrapped) content += '(';
     content += p_node->local->name;
+    if (p_node->wrapped) content += ')';
 }

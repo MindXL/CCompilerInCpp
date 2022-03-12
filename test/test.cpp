@@ -136,10 +136,10 @@ TEST_CASE("Parser", "[Parser]") {
         REQUIRE(T("a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;") == "a=0;a==0;a!=0;a>0;a>=0;a<0;a<=0;");
     }
 
-//    SECTION("Parentheses") {
-//        REQUIRE(T("(1+2);") == "1+2;");
-//        REQUIRE(T("1+(2+3);") == "1+(2+3);");
-//    }
+    SECTION("Parentheses") {
+        REQUIRE(testParser("(1+2);") == "(1+2);");
+        REQUIRE(testParser("1+(2+3);") == "1+(2+3);");
+    }
 
     SECTION("Identifier") {
         REQUIRE(T("1+a/2;") == "1+a/2;");    // identifier(variable)
